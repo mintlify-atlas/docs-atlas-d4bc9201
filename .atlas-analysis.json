@@ -1,0 +1,136 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Kelly AI",
+  "projectDescription": "Python SDK for integrating AI-powered image generation, language models, voice synthesis, and image editing with just a few lines of code.",
+  "theme": "palm",
+  "primaryColor": "#8B5CF6",
+  "lightColor": "#A78BFA",
+  "darkColor": "#7C3AED",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/image-generation",
+              "features/image-editing",
+              "features/language-models",
+              "features/voice-synthesis",
+              "features/voice-transcription",
+              "features/image-tools"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/installation",
+              "guides/async-usage",
+              "guides/error-handling",
+              "guides/working-with-images"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Client",
+            "pages": [
+              "api-reference/kellyapi"
+            ]
+          },
+          {
+            "group": "Image Generation",
+            "pages": [
+              "api-reference/generate",
+              "api-reference/img2img",
+              "api-reference/sd-models",
+              "api-reference/sdxl-models"
+            ]
+          },
+          {
+            "group": "Language Models",
+            "pages": [
+              "api-reference/llm",
+              "api-reference/llm-models",
+              "api-reference/img2text"
+            ]
+          },
+          {
+            "group": "Image Tools",
+            "pages": [
+              "api-reference/upscale",
+              "api-reference/removebg"
+            ]
+          },
+          {
+            "group": "Voice",
+            "pages": [
+              "api-reference/text2voice",
+              "api-reference/voice2text",
+              "api-reference/voice-models"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "api-reference/text2write",
+              "api-reference/code2image"
+            ]
+          },
+          {
+            "group": "Errors",
+            "pages": [
+              "api-reference/errors"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "58+ Stable Diffusion and 8 SDXL models for image generation",
+    "Multiple LLM models (ChatGPT, Gemini, Gemma, KellyAI)",
+    "Image-to-image editing and enhancement",
+    "4x image upscaling and background removal",
+    "Text-to-voice with 49 voice models",
+    "Voice-to-text transcription",
+    "Code and text to image conversion",
+    "Async/await support with aiohttp",
+    "Simple authentication with API key"
+  ],
+  "publicApiSurface": [
+    "KellyAPI",
+    "KellyAPI.generate()",
+    "KellyAPI.img2img()",
+    "KellyAPI.img2text()",
+    "KellyAPI.llm()",
+    "KellyAPI.upscale()",
+    "KellyAPI.removebg()",
+    "KellyAPI.text2voice()",
+    "KellyAPI.voice2text()",
+    "KellyAPI.text2write()",
+    "KellyAPI.code2image()",
+    "KellyAPI.sd_models()",
+    "KellyAPI.sdxl_models()",
+    "KellyAPI.llm_models()",
+    "KellyAPI.voice_models()",
+    "InvalidApiKey",
+    "TimeoutError",
+    "InvalidRequest",
+    "InvalidContent",
+    "GenericApiError",
+    "ConnectionError"
+  ]
+}
