@@ -45,7 +45,8 @@ Raised when the API request exceeds the timeout limit.
 **Usage:**
 ```python
 import asyncio
-from kellyapi import KellyAPI, TimeoutError
+from kellyapi import KellyAPI
+from kellyapi.errors import TimeoutError
 
 async def main():
     client = KellyAPI(api_key="your_api_key")
@@ -71,7 +72,8 @@ Raised when the API request is invalid or malformed.
 **Usage:**
 ```python
 import asyncio
-from kellyapi import KellyAPI, InvalidRequest
+from kellyapi import KellyAPI
+from kellyapi.errors import InvalidRequest
 
 async def main():
     client = KellyAPI(api_key="your_api_key")
@@ -98,7 +100,8 @@ Raised when the API returns content that cannot be processed.
 **Usage:**
 ```python
 import asyncio
-from kellyapi import KellyAPI, InvalidContent
+from kellyapi import KellyAPI
+from kellyapi.errors import InvalidContent
 
 async def main():
     client = KellyAPI(api_key="your_api_key")
@@ -124,7 +127,8 @@ Raised when a generic API error occurs that doesn't fit other categories.
 **Usage:**
 ```python
 import asyncio
-from kellyapi import KellyAPI, GenericApiError
+from kellyapi import KellyAPI
+from kellyapi.errors import GenericApiError
 
 async def main():
     client = KellyAPI(api_key="your_api_key")
@@ -151,7 +155,8 @@ Raised when the SDK cannot establish a connection to the API server.
 **Usage:**
 ```python
 import asyncio
-from kellyapi import KellyAPI, ConnectionError
+from kellyapi import KellyAPI
+from kellyapi.errors import ConnectionError
 
 async def main():
     client = KellyAPI(api_key="your_api_key")
@@ -178,7 +183,8 @@ Raised when the API key is invalid or unauthorized.
 **Usage:**
 ```python
 import asyncio
-from kellyapi import KellyAPI, InvalidApiKey
+from kellyapi import KellyAPI
+from kellyapi.errors import InvalidApiKey
 
 async def main():
     client = KellyAPI(api_key="invalid_key")
@@ -198,8 +204,8 @@ Here's an example of handling all possible errors in a single try-except block:
 
 ```python
 import asyncio
-from kellyapi import (
-    KellyAPI,
+from kellyapi import KellyAPI
+from kellyapi.errors import (
     BaseError,
     TimeoutError,
     InvalidRequest,
