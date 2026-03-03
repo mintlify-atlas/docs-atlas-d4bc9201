@@ -1,0 +1,110 @@
+---
+title: "llm_models()"
+description: "Get a list of available language models"
+---
+
+## llm_models()
+
+Retrieve a list of all available language models that you can use with the `llm()` method. This endpoint returns the current models supported by the Kelly AI API.
+
+### Method signature
+
+```python
+await client.llm_models()
+```
+
+### Parameters
+
+This method does not take any parameters.
+
+### Returns
+
+<ResponseField name="models" type="list">
+  A list of available language model identifiers that you can use with the `llm()` method.
+</ResponseField>
+
+### Usage examples
+
+#### Get available models
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    models = await client.llm_models()
+    print("Available language models:")
+    print(models)
+
+asyncio.run(main())
+```
+
+#### Check if a model is available
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    models = await client.llm_models()
+    
+    if "gemini" in models:
+        print("Gemini model is available")
+        response = await client.llm(
+            prompt="Hello, Gemini!",
+            model="gemini"
+        )
+        print(response)
+    else:
+        print("Gemini model is not available")
+
+asyncio.run(main())
+```
+
+#### List all available models
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    models = await client.llm_models()
+    
+    print("You can use the following models:")
+    for model in models:
+        print(f"- {model}")
+
+asyncio.run(main())
+```
+
+#### Dynamic model selection
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    # Get available models
+    models = await client.llm_models()
+    
+    # Use the first available model
+    if models:
+        selected_model = models[0]
+        print(f"Using model: {selected_model}")
+        
+        response = await client.llm(
+            prompt="What can you help me with?",
+            model=selected_model
+        )
+        print(response)
+
+asyncio.run(main())
+```

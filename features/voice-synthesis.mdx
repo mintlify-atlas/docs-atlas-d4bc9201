@@ -1,0 +1,211 @@
+---
+title: Voice synthesis
+description: Convert text to natural-sounding speech with 49 voice models
+---
+
+Transform text into high-quality audio using advanced text-to-speech technology. Kelly AI offers 49 different voice models with various accents, languages, and speaking styles.
+
+## Generate speech
+
+Convert text to speech using the `text2voice()` method.
+
+<Steps>
+  <Step title="Import and initialize">
+    ```python
+    from kellyapi import KellyAPI
+
+    kelly = KellyAPI(api_key="your_api_key")
+    ```
+  </Step>
+
+  <Step title="Generate audio">
+    ```python
+    audio_data = await kelly.text2voice(
+        text="Hello, welcome to Kelly AI voice synthesis.",
+        model="en-US_LisaExpressive"
+    )
+    ```
+  </Step>
+
+  <Step title="Save the audio">
+    ```python
+    with open("output.mp3", "wb") as f:
+        f.write(audio_data)
+    ```
+  </Step>
+</Steps>
+
+## Parameters
+
+<ParamField path="text" type="str" required>
+  The text you want to convert to speech. Can include punctuation for natural pauses.
+</ParamField>
+
+<ParamField path="model" type="str" default="en-US_LisaExpressive">
+  The voice model to use. Different models offer different accents, genders, and speaking styles.
+</ParamField>
+
+## Available voice models
+
+Retrieve the complete list of 49 available voice models:
+
+```python
+voices = await kelly.voice_models()
+print(voices)
+```
+
+This returns all voice models with their identifiers, languages, and characteristics.
+
+## Complete example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def generate_speech():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # List available voices
+    voices = await kelly.voice_models()
+    print("Available voices:", voices)
+    
+    # Generate speech
+    text = "Artificial intelligence is transforming how we interact with technology."
+    
+    audio_data = await kelly.text2voice(
+        text=text,
+        model="en-US_LisaExpressive"
+    )
+    
+    # Save the audio file
+    with open("speech.mp3", "wb") as f:
+        f.write(audio_data)
+    
+    print("Speech generated successfully!")
+
+# Run the async function
+asyncio.run(generate_speech())
+```
+
+## Use cases
+
+### Audiobook creation
+
+Convert written content to audio:
+
+```python
+book_chapter = """
+Chapter 1: The Beginning
+
+It was a dark and stormy night when Sarah first discovered 
+the mysterious package on her doorstep.
+"""
+
+audio = await kelly.text2voice(
+    text=book_chapter,
+    model="en-US_LisaExpressive"
+)
+
+with open("chapter1.mp3", "wb") as f:
+    f.write(audio)
+```
+
+### Voice notifications
+
+Create audio alerts for applications:
+
+```python
+audio = await kelly.text2voice(
+    text="Your order has been shipped and will arrive tomorrow.",
+    model="en-US_LisaExpressive"
+)
+
+with open("notification.mp3", "wb") as f:
+    f.write(audio)
+```
+
+### Educational content
+
+Generate pronunciation guides:
+
+```python
+audio = await kelly.text2voice(
+    text="Welcome to today's lesson. We'll be learning about photosynthesis.",
+    model="en-US_LisaExpressive"
+)
+
+with open("lesson_intro.mp3", "wb") as f:
+    f.write(audio)
+```
+
+### Accessibility features
+
+Provide text-to-speech for visually impaired users:
+
+```python
+webpage_text = "Welcome to our website. Navigate using the menu on the left."
+
+audio = await kelly.text2voice(
+    text=webpage_text,
+    model="en-US_LisaExpressive"
+)
+
+with open("accessibility_audio.mp3", "wb") as f:
+    f.write(audio)
+```
+
+### Multi-language content
+
+Generate speech in different languages:
+
+```python
+# English
+audio_en = await kelly.text2voice(
+    text="Hello, how are you today?",
+    model="en-US_LisaExpressive"
+)
+
+# Save each language separately
+with open("greeting_en.mp3", "wb") as f:
+    f.write(audio_en)
+```
+
+## Batch processing
+
+Generate multiple audio files:
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def batch_generate():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    phrases = [
+        "Welcome to our service.",
+        "Your transaction is complete.",
+        "Thank you for your patience.",
+        "Please try again later."
+    ]
+    
+    for i, phrase in enumerate(phrases):
+        audio = await kelly.text2voice(
+            text=phrase,
+            model="en-US_LisaExpressive"
+        )
+        
+        with open(f"audio_{i+1}.mp3", "wb") as f:
+            f.write(audio)
+        
+        print(f"Generated audio_{i+1}.mp3")
+
+asyncio.run(batch_generate())
+```
+
+<Note>
+  The `text2voice()` method returns raw audio data as bytes. Save it to a file with an appropriate audio extension (.mp3, .wav, etc.).
+</Note>
+
+<Tip>
+  Use punctuation in your text to control pacing and natural pauses. Commas create brief pauses, while periods create longer ones. Question marks add natural interrogative intonation.
+</Tip>

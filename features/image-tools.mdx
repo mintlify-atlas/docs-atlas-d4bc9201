@@ -1,0 +1,271 @@
+---
+title: Image tools
+description: Upscale images and remove backgrounds with AI-powered tools
+---
+
+Enhance and modify images using specialized AI tools. Kelly AI provides professional-grade image upscaling and automatic background removal capabilities.
+
+## Upscale images
+
+Increase image resolution and quality using the `upscale()` method.
+
+<Steps>
+  <Step title="Prepare your image">
+    Convert your image to base64:
+    ```python
+    import base64
+    from kellyapi import KellyAPI
+
+    # Read and encode the image
+    with open("low_res.png", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
+    kelly = KellyAPI(api_key="your_api_key")
+    ```
+  </Step>
+
+  <Step title="Upscale">
+    ```python
+    upscaled_image = await kelly.upscale(image_data=image_base64)
+    ```
+  </Step>
+
+  <Step title="Save the result">
+    ```python
+    with open("high_res.png", "wb") as f:
+        f.write(upscaled_image)
+    ```
+  </Step>
+</Steps>
+
+### Parameters
+
+<ParamField path="image_data" type="str" required>
+  The source image encoded as a base64 string.
+</ParamField>
+
+## Remove backgrounds
+
+Automatically remove image backgrounds using the `removebg()` method.
+
+<Steps>
+  <Step title="Prepare your image">
+    Convert your image to base64:
+    ```python
+    import base64
+    from kellyapi import KellyAPI
+
+    # Read and encode the image
+    with open("photo.jpg", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
+    kelly = KellyAPI(api_key="your_api_key")
+    ```
+  </Step>
+
+  <Step title="Remove background">
+    ```python
+    no_bg_image = await kelly.removebg(image_data=image_base64)
+    ```
+  </Step>
+
+  <Step title="Save the result">
+    ```python
+    with open("no_background.png", "wb") as f:
+        f.write(no_bg_image)
+    ```
+  </Step>
+</Steps>
+
+### Parameters
+
+<ParamField path="image_data" type="str" required>
+  The source image encoded as a base64 string.
+</ParamField>
+
+## Complete example
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+async def process_image():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # Load the original image
+    with open("product.jpg", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    
+    # Remove background
+    print("Removing background...")
+    no_bg = await kelly.removebg(image_data=image_base64)
+    
+    with open("product_no_bg.png", "wb") as f:
+        f.write(no_bg)
+    
+    # Upscale the result
+    print("Upscaling image...")
+    no_bg_base64 = base64.b64encode(no_bg).decode("utf-8")
+    upscaled = await kelly.upscale(image_data=no_bg_base64)
+    
+    with open("product_final.png", "wb") as f:
+        f.write(upscaled)
+    
+    print("Image processing complete!")
+
+# Run the async function
+asyncio.run(process_image())
+```
+
+## Use cases
+
+### Product photography
+
+Create professional product images:
+
+```python
+async def prepare_product_image():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # Load product photo
+    with open("product_raw.jpg", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    
+    # Remove background for clean look
+    clean_image = await kelly.removebg(image_data=image_base64)
+    
+    # Upscale for high-quality display
+    clean_base64 = base64.b64encode(clean_image).decode("utf-8")
+    final_image = await kelly.upscale(image_data=clean_base64)
+    
+    with open("product_ecommerce.png", "wb") as f:
+        f.write(final_image)
+```
+
+### Portrait enhancement
+
+Enhance portrait photos:
+
+```python
+async def enhance_portrait():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    with open("portrait.jpg", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    
+    # Upscale for higher quality
+    enhanced = await kelly.upscale(image_data=image_base64)
+    
+    with open("portrait_hd.png", "wb") as f:
+        f.write(enhanced)
+```
+
+### Social media content
+
+Prepare images for social media:
+
+```python
+async def social_media_image():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    with open("person.jpg", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    
+    # Remove background for overlay on custom backgrounds
+    no_bg = await kelly.removebg(image_data=image_base64)
+    
+    with open("person_cutout.png", "wb") as f:
+        f.write(no_bg)
+```
+
+### Print preparation
+
+Prepare images for high-resolution printing:
+
+```python
+async def prepare_for_print():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    with open("photo.jpg", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    
+    # Upscale to print quality
+    print_ready = await kelly.upscale(image_data=image_base64)
+    
+    with open("photo_print.png", "wb") as f:
+        f.write(print_ready)
+```
+
+### Logo extraction
+
+Extract logos from images:
+
+```python
+async def extract_logo():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    with open("logo_with_bg.png", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    
+    # Remove background to get transparent logo
+    logo = await kelly.removebg(image_data=image_base64)
+    
+    with open("logo_transparent.png", "wb") as f:
+        f.write(logo)
+```
+
+## Batch processing
+
+Process multiple images efficiently:
+
+```python
+import asyncio
+import base64
+from pathlib import Path
+from kellyapi import KellyAPI
+
+async def batch_remove_backgrounds():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # Get all images in directory
+    image_files = list(Path("originals").glob("*.jpg"))
+    
+    for image_file in image_files:
+        print(f"Processing {image_file.name}...")
+        
+        # Read and encode
+        with open(image_file, "rb") as f:
+            image_bytes = f.read()
+        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+        
+        # Remove background
+        no_bg = await kelly.removebg(image_data=image_base64)
+        
+        # Save result
+        output_path = Path("processed") / image_file.with_suffix(".png").name
+        output_path.parent.mkdir(exist_ok=True)
+        
+        with open(output_path, "wb") as f:
+            f.write(no_bg)
+        
+        print(f"Saved to {output_path}")
+
+asyncio.run(batch_remove_backgrounds())
+```
+
+<Note>
+  Both `upscale()` and `removebg()` methods require base64-encoded images as input and return raw image data as bytes.
+</Note>
+
+<Tip>
+  When removing backgrounds, images with clear subject separation from the background produce the best results. For upscaling, the AI enhances details and sharpness while increasing resolution.
+</Tip>

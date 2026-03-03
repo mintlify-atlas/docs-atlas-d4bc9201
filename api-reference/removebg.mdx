@@ -1,0 +1,61 @@
+---
+title: removebg()
+description: Remove background from images using AI
+---
+
+## Method signature
+
+```python
+async def removebg(image_data: str)
+```
+
+Remove the background from images automatically using AI-powered background removal technology.
+
+## Parameters
+
+<ParamField path="image_data" type="str" required>
+  The image data in base64-encoded string format. You need to encode your image file to base64 before passing it to this method
+</ParamField>
+
+## Returns
+
+<ResponseField name="image_data" type="bytes">
+  The processed image data with background removed in bytes format, decoded from base64data. The output image will have a transparent background. You can save this to a file or process it further
+</ResponseField>
+
+## Example
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+api = KellyAPI(api_key="your_api_key")
+
+async def main():
+    # Read and encode image file
+    with open("portrait.jpg", "rb") as f:
+        image_bytes = f.read()
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+    
+    # Remove background from the image
+    result_image = await api.removebg(image_data=image_base64)
+    
+    # Save the image with transparent background
+    with open("portrait_no_bg.png", "wb") as f:
+        f.write(result_image)
+    
+    print("Background removed successfully")
+
+asyncio.run(main())
+```
+
+## Notes
+
+- The image_data parameter must be a base64-encoded string
+- The method returns processed image data in bytes format, which is automatically decoded from the base64data response
+- The output image will have a transparent background, making it suitable for compositing
+- Works best with images that have clear foreground subjects (people, objects, products)
+- Supported image formats include JPEG, PNG, and other common image formats
+- Make sure to encode your image file to base64 before passing it to this method
+- Save the output as PNG to preserve transparency

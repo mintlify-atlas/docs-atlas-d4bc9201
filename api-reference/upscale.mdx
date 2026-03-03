@@ -1,0 +1,60 @@
+---
+title: upscale()
+description: Upscale images to 4x resolution using AI enhancement
+---
+
+## Method signature
+
+```python
+async def upscale(image_data: str)
+```
+
+Upscale images to 4x their original resolution using AI-powered image enhancement technology.
+
+## Parameters
+
+<ParamField path="image_data" type="str" required>
+  The image data in base64-encoded string format. You need to encode your image file to base64 before passing it to this method
+</ParamField>
+
+## Returns
+
+<ResponseField name="image_data" type="bytes">
+  The upscaled image data in bytes format, decoded from base64data. The output image will be 4x the resolution of the input image. You can save this to a file or process it further
+</ResponseField>
+
+## Example
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+api = KellyAPI(api_key="your_api_key")
+
+async def main():
+    # Read and encode image file
+    with open("input.jpg", "rb") as f:
+        image_bytes = f.read()
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+    
+    # Upscale the image to 4x resolution
+    upscaled_image = await api.upscale(image_data=image_base64)
+    
+    # Save the upscaled image
+    with open("output_4x.jpg", "wb") as f:
+        f.write(upscaled_image)
+    
+    print("Image upscaled successfully to 4x resolution")
+
+asyncio.run(main())
+```
+
+## Notes
+
+- The image_data parameter must be a base64-encoded string
+- The method returns upscaled image data in bytes format, which is automatically decoded from the base64data response
+- The output image will be 4x the resolution of your input image (2x width and 2x height)
+- Supported image formats include JPEG, PNG, and other common image formats
+- Make sure to encode your image file to base64 before passing it to this method
+- Processing time may vary depending on the size of the input image

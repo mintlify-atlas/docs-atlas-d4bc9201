@@ -1,122 +1,114 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Kelly AI",
+  "theme": "palm",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#8B5CF6",
+    "light": "#A78BFA",
+    "dark": "#7C3AED"
   },
-  "favicon": "/favicon.svg",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/notreallyprince/kelly-API"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/notreallyprince/kelly-API"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Get Started",
             "pages": [
-              "index",
+              "introduction",
               "quickstart",
-              "development"
+              "authentication"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Core Features",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "features/image-generation",
+              "features/image-editing",
+              "features/language-models",
+              "features/voice-synthesis",
+              "features/voice-transcription",
+              "features/image-tools"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Guides",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "guides/installation",
+              "guides/async-usage",
+              "guides/error-handling",
+              "guides/working-with-images"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Client",
             "pages": [
-              "api-reference/introduction"
+              "api-reference/kellyapi"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Image Generation",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/generate",
+              "api-reference/img2img",
+              "api-reference/sd-models",
+              "api-reference/sdxl-models"
+            ]
+          },
+          {
+            "group": "Language Models",
+            "pages": [
+              "api-reference/llm",
+              "api-reference/llm-models",
+              "api-reference/img2text"
+            ]
+          },
+          {
+            "group": "Image Tools",
+            "pages": [
+              "api-reference/upscale",
+              "api-reference/removebg"
+            ]
+          },
+          {
+            "group": "Voice",
+            "pages": [
+              "api-reference/text2voice",
+              "api-reference/voice2text",
+              "api-reference/voice-models"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "api-reference/text2write",
+              "api-reference/code2image"
+            ]
+          },
+          {
+            "group": "Errors",
+            "pages": [
+              "api-reference/errors"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+    ]
   }
 }

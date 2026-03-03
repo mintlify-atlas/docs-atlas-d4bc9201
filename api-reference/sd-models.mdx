@@ -1,0 +1,53 @@
+---
+title: sd_models()
+description: List all available Stable Diffusion models for image generation
+---
+
+## Method signature
+
+```python
+async def sd_models()
+```
+
+Retrieve a list of all available Stable Diffusion models that you can use with the `generate()` method. This helps you discover which models are available for text-to-image generation.
+
+## Parameters
+
+This method takes no parameters.
+
+## Returns
+
+<ResponseField name="content" type="dict">
+  A dictionary containing the list of available Stable Diffusion models and their details.
+</ResponseField>
+
+## Example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+api = KellyAPI(api_key="your_api_key")
+
+async def list_models():
+    # Get all available Stable Diffusion models
+    models = await api.sd_models()
+    
+    print("Available Stable Diffusion models:")
+    print(models)
+    
+    # Use one of the models for image generation
+    image_data = await api.generate(
+        prompt="A beautiful landscape",
+        model="PhotoPerfect"  # Use a model from the list
+    )
+
+asyncio.run(list_models())
+```
+
+## Notes
+
+- This method is asynchronous and must be awaited
+- The returned models can be used as the `model` parameter in the `generate()` method
+- Model availability may change over time; call this method to get the current list
+- For SDXL models specifically, use the `sdxl_models()` method instead

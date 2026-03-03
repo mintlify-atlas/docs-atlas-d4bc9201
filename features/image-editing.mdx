@@ -1,0 +1,186 @@
+---
+title: Image editing
+description: Transform existing images with AI-powered image-to-image editing
+---
+
+Modify and enhance existing images using AI. The image-to-image feature allows you to transform photos based on text prompts while preserving the original composition and structure.
+
+## Edit an image
+
+Transform existing images using the `img2img()` method.
+
+<Steps>
+  <Step title="Prepare your image">
+    Convert your image to base64 format:
+    ```python
+    import base64
+    from kellyapi import KellyAPI
+
+    # Read and encode the image
+    with open("input.png", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
+    kelly = KellyAPI(api_key="your_api_key")
+    ```
+  </Step>
+
+  <Step title="Apply transformation">
+    ```python
+    edited_image = await kelly.img2img(
+        prompt="Turn this into a watercolor painting",
+        image_data=image_base64,
+        width=1024,
+        height=1024
+    )
+    ```
+  </Step>
+
+  <Step title="Save the result">
+    ```python
+    with open("edited.png", "wb") as f:
+        f.write(edited_image)
+    ```
+  </Step>
+</Steps>
+
+## Parameters
+
+<ParamField path="prompt" type="str" required>
+  Description of how you want to transform the image. This guides the AI's editing process.
+</ParamField>
+
+<ParamField path="image_data" type="str" required>
+  The source image encoded as a base64 string.
+</ParamField>
+
+<ParamField path="negative_prompt" type="str" default="canvas frame, cartoon, 3d, ((disfigured)), ((bad art))...">
+  Describes what you don't want in the edited image. The default value excludes common unwanted elements.
+</ParamField>
+
+<ParamField path="width" type="str" default="1024">
+  Output image width in pixels.
+</ParamField>
+
+<ParamField path="height" type="str" default="1024">
+  Output image height in pixels.
+</ParamField>
+
+## Complete example
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+async def edit_image():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # Load and encode the source image
+    with open("photo.jpg", "rb") as f:
+        image_bytes = f.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    
+    # Transform the image
+    result = await kelly.img2img(
+        prompt="Convert to anime art style with vibrant colors",
+        image_data=image_base64,
+        negative_prompt="blurry, low quality, distorted, realistic",
+        width=1024,
+        height=1024
+    )
+    
+    # Save the edited image
+    with open("anime_style.png", "wb") as f:
+        f.write(result)
+    
+    print("Image edited successfully!")
+
+# Run the async function
+asyncio.run(edit_image())
+```
+
+## Use cases
+
+### Style transfer
+
+Transform photos into different artistic styles:
+
+```python
+result = await kelly.img2img(
+    prompt="Oil painting style with impressionist brushstrokes",
+    image_data=image_base64,
+    width=1024,
+    height=768
+)
+```
+
+### Photo enhancement
+
+Enhance and improve existing photos:
+
+```python
+result = await kelly.img2img(
+    prompt="Professional studio portrait, perfect lighting, high detail, sharp focus",
+    image_data=image_base64,
+    width=512,
+    height=768
+)
+```
+
+### Scene modification
+
+Change elements within an image:
+
+```python
+result = await kelly.img2img(
+    prompt="Same scene but at sunset with golden hour lighting",
+    image_data=image_base64,
+    width=1024,
+    height=1024
+)
+```
+
+### Creative variations
+
+Generate alternative versions of an image:
+
+```python
+result = await kelly.img2img(
+    prompt="Fantasy version with magical elements and glowing effects",
+    image_data=image_base64,
+    width=1024,
+    height=1024
+)
+```
+
+## Image description
+
+You can also extract text descriptions from images using the `img2text()` method:
+
+```python
+description = await kelly.img2text(
+    prompt="Describe this image in detail",
+    image_data=image_base64
+)
+
+print(description)
+```
+
+### Parameters
+
+<ParamField path="prompt" type="str" required>
+  Instructions for the description. For example, "Describe this image" or "What objects are in this photo?"
+</ParamField>
+
+<ParamField path="image_data" type="str" required>
+  The image encoded as a base64 string.
+</ParamField>
+
+<Note>
+  The `img2img()` method preserves the general composition and structure of your input image while applying the transformation described in your prompt.
+</Note>
+
+<Tip>
+  For more accurate edits, use specific prompts that describe the desired style, mood, or changes. Include quality descriptors like "high detail" or "professional quality" for better results.
+</Tip>

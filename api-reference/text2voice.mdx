@@ -1,0 +1,63 @@
+---
+title: text2voice()
+description: Convert text to speech using voice models
+---
+
+## Method signature
+
+```python
+async def text2voice(text: str, model: str = "en-US_LisaExpressive")
+```
+
+Convert text to speech audio using one of 49 available voice models.
+
+## Parameters
+
+<ParamField path="text" type="str" required>
+  The text you want to convert to speech
+</ParamField>
+
+<ParamField path="model" type="str" default="en-US_LisaExpressive">
+  The voice model to use for text-to-speech generation. You can get a list of all 49 available voice models using the `voice_models()` method
+</ParamField>
+
+## Returns
+
+<ResponseField name="audio_data" type="bytes">
+  The generated audio data in bytes format, decoded from base64data. You can save this to a file or play it directly
+</ResponseField>
+
+## Example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+api = KellyAPI(api_key="your_api_key")
+
+async def main():
+    # Generate speech with default voice
+    audio_data = await api.text2voice("Hello, welcome to Kelly AI!")
+    
+    # Save to file
+    with open("output.wav", "wb") as f:
+        f.write(audio_data)
+    
+    # Use a different voice model
+    audio_data = await api.text2voice(
+        text="This is a different voice",
+        model="en-GB_KateV3Voice"
+    )
+    
+    with open("output2.wav", "wb") as f:
+        f.write(audio_data)
+
+asyncio.run(main())
+```
+
+## Notes
+
+- The method returns audio data in bytes format, which is automatically decoded from the base64data response
+- The default voice model is `en-US_LisaExpressive`
+- You can retrieve all available voice models using the `voice_models()` method
+- The audio format is determined by the API and is suitable for direct playback or file storage

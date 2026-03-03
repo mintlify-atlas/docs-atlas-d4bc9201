@@ -1,0 +1,205 @@
+---
+title: Async usage
+description: Learn how to properly use async/await with the Kelly AI SDK
+---
+
+## Overview
+
+The Kelly AI SDK is built entirely on async/await syntax using `aiohttp` for HTTP requests. All API methods are asynchronous and must be awaited.
+
+## Basic usage
+
+To use the SDK, you need to create an instance of `KellyAPI` and call its methods within an async function:
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def main():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    # Call async methods
+    response = await api.llm(prompt="Hello, world!")
+    print(response)
+
+# Run the async function
+asyncio.run(main())
+```
+
+<Note>
+  All API methods in the SDK return coroutines that must be awaited. Forgetting to use `await` will return a coroutine object instead of the actual result.
+</Note>
+
+## Session management
+
+The SDK automatically manages `aiohttp.ClientSession` instances. By default, a new session is created for each request:
+
+```python
+from kellyapi import KellyAPI
+
+# Default behavior - new session per request
+api = KellyAPI(api_key="your_api_key_here")
+```
+
+### Custom session (recommended)
+
+For better performance when making multiple requests, you can provide your own `aiohttp.ClientSession`:
+
+```python
+import aiohttp
+from kellyapi import KellyAPI
+
+async def main():
+    # Create a session that will be reused
+    async with aiohttp.ClientSession() as session:
+        api = KellyAPI(
+            api_key="your_api_key_here",
+            session=lambda: session
+        )
+        
+        # Make multiple requests with the same session
+        response1 = await api.llm(prompt="First question")
+        response2 = await api.llm(prompt="Second question")
+        response3 = await api.generate(prompt="An image")
+```
+
+<Warning>
+  When passing a custom session, you must pass it as a callable (lambda or function) that returns the session object, not the session directly. See the example above.
+</Warning>
+
+## Making multiple concurrent requests
+
+You can use `asyncio.gather()` to make multiple API calls concurrently:
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def main():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    # Run multiple requests concurrently
+    results = await asyncio.gather(
+        api.llm(prompt="What is AI?"),
+        api.llm(prompt="What is ML?"),
+        api.llm(prompt="What is DL?")
+    )
+    
+    for i, result in enumerate(results, 1):
+        print(f"Response {i}: {result}")
+
+asyncio.run(main())
+```
+
+## Timeout configuration
+
+The SDK uses a default timeout of 60 seconds for API requests. This is handled internally in the `_fetch` and `_post_json` methods:
+
+```python
+async def _fetch(self, route, timeout=60, **params):
+    async with self.session() as client:
+        resp = await client.get(
+            self.api + route,
+            params=params,
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            timeout=timeout,
+        )
+```
+
+<Accordion title="View full implementation">
+  The timeout is applied to all HTTP requests in the SDK. If a request exceeds the timeout, a `TimeoutError` will be raised. See the [error handling guide](/guides/error-handling) for more information.
+  
+  From `/home/daytona/workspace/source/kellyapi/api.py:31-53`
+</Accordion>
+
+## Running in different contexts
+
+<Tabs>
+  <Tab title="Standalone script">
+    ```python
+    import asyncio
+    from kellyapi import KellyAPI
+
+    async def main():
+        api = KellyAPI(api_key="your_api_key_here")
+        result = await api.llm(prompt="Hello!")
+        print(result)
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+  </Tab>
+  
+  <Tab title="Jupyter Notebook">
+    ```python
+    # In Jupyter, you can use await directly
+    from kellyapi import KellyAPI
+
+    api = KellyAPI(api_key="your_api_key_here")
+    result = await api.llm(prompt="Hello!")
+    print(result)
+    ```
+  </Tab>
+  
+  <Tab title="Existing event loop">
+    ```python
+    import asyncio
+    from kellyapi import KellyAPI
+
+    async def use_kelly_api():
+        api = KellyAPI(api_key="your_api_key_here")
+        result = await api.llm(prompt="Hello!")
+        return result
+
+    # If you already have an event loop running
+    loop = asyncio.get_event_loop()
+    result = loop.run_until_complete(use_kelly_api())
+    ```
+  </Tab>
+</Tabs>
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Always use async/await">
+    All SDK methods are asynchronous and must be awaited. Never call them without `await`:
+    
+    ```python
+    # ❌ Wrong - returns a coroutine object
+    result = api.llm(prompt="Hello")
+    
+    # ✅ Correct - awaits the result
+    result = await api.llm(prompt="Hello")
+    ```
+  </Accordion>
+  
+  <Accordion title="Reuse sessions for multiple requests">
+    Creating a new session for each request adds overhead. Reuse sessions when making multiple API calls:
+    
+    ```python
+    async with aiohttp.ClientSession() as session:
+        api = KellyAPI(api_key="key", session=lambda: session)
+        # Make multiple requests...
+    ```
+  </Accordion>
+  
+  <Accordion title="Handle timeouts appropriately">
+    Long-running operations like image generation may take time. Consider increasing timeouts or implementing retry logic for critical operations.
+  </Accordion>
+  
+  <Accordion title="Use asyncio.gather for concurrent requests">
+    When you need results from multiple independent API calls, use `asyncio.gather()` to run them concurrently rather than sequentially.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Error handling" icon="triangle-exclamation" href="/guides/error-handling">
+    Learn how to handle errors and exceptions
+  </Card>
+  
+  <Card title="Working with images" icon="image" href="/guides/working-with-images">
+    Handle image data with base64 encoding
+  </Card>
+</CardGroup>

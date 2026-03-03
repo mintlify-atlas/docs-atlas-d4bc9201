@@ -1,0 +1,236 @@
+---
+title: Voice transcription
+description: Convert audio recordings to accurate text transcriptions
+---
+
+Transcribe audio files into text with high accuracy. Kelly AI's voice-to-text feature supports multiple languages and audio formats, making it easy to convert speech into written form.
+
+## Transcribe audio
+
+Convert audio to text using the `voice2text()` method.
+
+<Steps>
+  <Step title="Prepare your audio">
+    Encode your audio file to base64:
+    ```python
+    import base64
+    from kellyapi import KellyAPI
+
+    # Read and encode the audio file
+    with open("recording.mp3", "rb") as f:
+        audio_bytes = f.read()
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+
+    kelly = KellyAPI(api_key="your_api_key")
+    ```
+  </Step>
+
+  <Step title="Transcribe">
+    ```python
+    transcription = await kelly.voice2text(audio=audio_base64)
+    ```
+  </Step>
+
+  <Step title="Use the result">
+    ```python
+    print("Transcription:", transcription)
+    ```
+  </Step>
+</Steps>
+
+## Parameters
+
+<ParamField path="audio" type="str" required>
+  The audio file encoded as a base64 string. Supports common audio formats like MP3, WAV, and M4A.
+</ParamField>
+
+## Complete example
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+async def transcribe_audio():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # Load and encode the audio file
+    with open("interview.mp3", "rb") as f:
+        audio_bytes = f.read()
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+    
+    # Transcribe the audio
+    transcription = await kelly.voice2text(audio=audio_base64)
+    
+    # Display the result
+    print("Transcription:")
+    print(transcription)
+    
+    # Optionally save to a text file
+    with open("transcription.txt", "w") as f:
+        f.write(transcription)
+    
+    print("\nTranscription saved to transcription.txt")
+
+# Run the async function
+asyncio.run(transcribe_audio())
+```
+
+## Use cases
+
+### Meeting transcription
+
+Convert recorded meetings into text:
+
+```python
+import base64
+from kellyapi import KellyAPI
+
+async def transcribe_meeting():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # Load meeting recording
+    with open("team_meeting.mp3", "rb") as f:
+        audio_bytes = f.read()
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+    
+    # Transcribe
+    text = await kelly.voice2text(audio=audio_base64)
+    
+    # Save with timestamp
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    with open(f"meeting_{timestamp}.txt", "w") as f:
+        f.write(text)
+    
+    return text
+```
+
+### Podcast transcription
+
+Create show notes from podcast episodes:
+
+```python
+async def transcribe_podcast():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    with open("podcast_episode_12.mp3", "rb") as f:
+        audio_bytes = f.read()
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+    
+    transcription = await kelly.voice2text(audio=audio_base64)
+    
+    # Save with episode info
+    with open("episode_12_transcript.txt", "w") as f:
+        f.write("Episode 12 Transcript\n")
+        f.write("=" * 50 + "\n\n")
+        f.write(transcription)
+    
+    print("Podcast transcribed successfully!")
+```
+
+### Interview documentation
+
+Document interviews automatically:
+
+```python
+async def transcribe_interview():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    with open("customer_interview.wav", "rb") as f:
+        audio_bytes = f.read()
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+    
+    transcription = await kelly.voice2text(audio=audio_base64)
+    
+    return transcription
+```
+
+### Voice memo conversion
+
+Convert voice notes to text:
+
+```python
+async def convert_voice_memo():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    with open("voice_memo.m4a", "rb") as f:
+        audio_bytes = f.read()
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+    
+    text = await kelly.voice2text(audio=audio_base64)
+    
+    print("Your note:")
+    print(text)
+    
+    return text
+```
+
+### Lecture notes
+
+Transcribe educational lectures:
+
+```python
+async def transcribe_lecture():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    with open("physics_lecture_1.mp3", "rb") as f:
+        audio_bytes = f.read()
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+    
+    transcription = await kelly.voice2text(audio=audio_base64)
+    
+    # Save with formatting
+    with open("lecture_notes.txt", "w") as f:
+        f.write("Physics Lecture Notes\n")
+        f.write("Date: [Today's Date]\n\n")
+        f.write(transcription)
+    
+    print("Lecture transcribed and saved!")
+```
+
+## Batch transcription
+
+Transcribe multiple audio files:
+
+```python
+import asyncio
+import base64
+from pathlib import Path
+from kellyapi import KellyAPI
+
+async def batch_transcribe():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # Get all audio files in a directory
+    audio_files = list(Path("audio_recordings").glob("*.mp3"))
+    
+    for audio_file in audio_files:
+        print(f"\nTranscribing {audio_file.name}...")
+        
+        # Read and encode
+        with open(audio_file, "rb") as f:
+            audio_bytes = f.read()
+        audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+        
+        # Transcribe
+        transcription = await kelly.voice2text(audio=audio_base64)
+        
+        # Save with same name but .txt extension
+        output_file = audio_file.with_suffix(".txt")
+        with open(output_file, "w") as f:
+            f.write(transcription)
+        
+        print(f"Saved to {output_file.name}")
+
+asyncio.run(batch_transcribe())
+```
+
+<Note>
+  The audio file must be base64 encoded before passing it to the `voice2text()` method. The method returns the transcribed text as a string.
+</Note>
+
+<Tip>
+  For best transcription accuracy, use high-quality audio recordings with minimal background noise. Clear speech and good audio quality produce significantly better results.
+</Tip>

@@ -1,0 +1,80 @@
+---
+title: generate()
+description: Generate images from text prompts using Stable Diffusion models
+---
+
+## Method signature
+
+```python
+async def generate(
+    prompt: str,
+    negative_prompt: str = "canvas frame, cartoon, 3d, ((disfigured)), ((bad art)), ((deformed)),((extra limbs)),((close up)),((b&w)), weird colors, blurry, (((duplicate))), ((morbid)), ((mutilated)), [out of frame], extra fingers, mutated hands, ((poorly drawn hands)), ((poorly drawn face)), (((mutation))), (((deformed))), ((ugly)), blurry, ((bad anatomy)), (((bad proportions))), ((extra limbs)), cloned face, (((disfigured))), out of frame, ugly, extra limbs, (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), ((missing legs)), (((extra arms))), (((extra legs))), mutated hands, (fused fingers), (too many fingers), (((long neck))), Photoshop, video game, ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, mutation, mutated, extra limbs, extra legs, extra arms, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, bad anatomy, nsfw",
+    model: str = "PhotoPerfect",
+    width: int = 1024,
+    height: int = 1024,
+)
+```
+
+Generate images from text descriptions using Stable Diffusion and SDXL models. This method creates high-quality images based on your prompt and returns the image data as decoded bytes.
+
+## Parameters
+
+<ParamField path="prompt" type="str" required>
+  The text description of the image you want to generate. Be specific and descriptive for best results.
+</ParamField>
+
+<ParamField path="negative_prompt" type="str" default="canvas frame, cartoon, 3d, ((disfigured))...">
+  Text describing what you don't want in the generated image. The default value includes common undesirable elements like distortions, poor anatomy, and NSFW content.
+</ParamField>
+
+<ParamField path="model" type="str" default="PhotoPerfect">
+  The Stable Diffusion model to use for generation. Use `sd_models()` to get a list of available models.
+</ParamField>
+
+<ParamField path="width" type="int" default="1024">
+  The width of the generated image in pixels.
+</ParamField>
+
+<ParamField path="height" type="int" default="1024">
+  The height of the generated image in pixels.
+</ParamField>
+
+## Returns
+
+<ResponseField name="image_data" type="bytes">
+  The generated image as decoded binary data. The API returns base64-encoded data which is automatically decoded to bytes for you.
+</ResponseField>
+
+## Example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+api = KellyAPI(api_key="your_api_key")
+
+async def generate_image():
+    # Generate an image with custom parameters
+    image_data = await api.generate(
+        prompt="A serene mountain landscape at sunset, photorealistic",
+        negative_prompt="blurry, low quality, distorted",
+        model="PhotoPerfect",
+        width=1024,
+        height=1024
+    )
+    
+    # Save the image to a file
+    with open("mountain_sunset.png", "wb") as f:
+        f.write(image_data)
+    
+    print("Image generated successfully!")
+
+asyncio.run(generate_image())
+```
+
+## Notes
+
+- The method automatically sets `responseType="base64data"` internally and decodes the response for you
+- All image generation operations are asynchronous and must be awaited
+- The default negative prompt is comprehensive and helps avoid common generation issues
+- Use `sd_models()` or `sdxl_models()` methods to discover available models

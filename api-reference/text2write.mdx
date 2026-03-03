@@ -1,0 +1,79 @@
+---
+title: text2write()
+description: Convert text to a handwritten notes image
+---
+
+## Overview
+
+The `text2write()` method converts your text into a realistic handwritten notes image. This is useful for creating authentic-looking handwritten content programmatically.
+
+## Method signature
+
+```python
+await client.text2write(text: str)
+```
+
+## Parameters
+
+<ParamField path="text" type="str" required>
+  The text you want to convert to handwritten notes
+</ParamField>
+
+## Returns
+
+Returns binary image data (bytes) containing the handwritten notes image in PNG format.
+
+## Code example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    # Convert text to handwritten notes
+    text = "Dear diary, today was an amazing day!"
+    image_data = await client.text2write(text=text)
+    
+    # Save the handwritten notes image
+    with open("handwritten_notes.png", "wb") as f:
+        f.write(image_data)
+    
+    print("Handwritten notes image saved successfully!")
+
+asyncio.run(main())
+```
+
+## Error handling
+
+```python
+import asyncio
+from kellyapi import KellyAPI, InvalidApiKey, TimeoutError, ConnectionError
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    try:
+        text = "This will be handwritten"
+        image_data = await client.text2write(text=text)
+        
+        with open("notes.png", "wb") as f:
+            f.write(image_data)
+            
+    except InvalidApiKey:
+        print("Invalid API key. Get an API key from @KellyAIBot")
+    except TimeoutError:
+        print("Request timed out. Please try again later")
+    except ConnectionError:
+        print("Failed to connect to server")
+
+asyncio.run(main())
+```
+
+## Notes
+
+- The method is asynchronous and must be awaited
+- The returned image data is in PNG format
+- You can save the image data directly to a file or process it further
+- The handwriting style is automatically determined by the API

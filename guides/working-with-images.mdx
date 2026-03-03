@@ -1,0 +1,413 @@
+---
+title: Working with images
+description: Learn how to handle image data with base64 encoding, BytesIO, and file operations
+---
+
+## Overview
+
+The Kelly AI SDK handles images using base64 encoding for both input and output. The SDK automatically manages encoding and decoding, but understanding how it works will help you integrate images into your applications.
+
+## Generating images
+
+The `generate()` method returns raw image bytes that you can save directly to a file:
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def main():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    # Generate an image
+    image_data = await api.generate(
+        prompt="A serene mountain landscape at sunset",
+        model="PhotoPerfect",
+        width=1024,
+        height=1024
+    )
+    
+    # Save to file
+    with open("landscape.png", "wb") as f:
+        f.write(image_data)
+    
+    print("Image saved as landscape.png")
+
+asyncio.run(main())
+```
+
+<Note>
+  The SDK automatically decodes base64 image data to bytes. You receive ready-to-save binary data from image generation methods.
+</Note>
+
+## How base64 decoding works internally
+
+The SDK requests base64-encoded images from the API and decodes them automatically:
+
+```python
+# From /home/daytona/workspace/source/kellyapi/api.py:95-105
+async def generate(self, prompt: str, ...):
+    kwargs = dict(
+        prompt=prompt,
+        # ... other parameters
+        responseType="base64data",  # Request base64 format
+    )
+    content = await self._post_json("image/generate", data=kwargs)
+    image_data = base64.b64decode(content.image)  # Decode to bytes
+    return image_data
+```
+
+This pattern is used across all image-generating methods:
+- `generate()` - Text to image
+- `img2img()` - Image to image editing
+- `upscale()` - Image upscaling
+- `removebg()` - Background removal
+- `text2write()` - Text to handwriting
+- `code2image()` - Code to image
+
+## Providing input images
+
+For methods that accept images as input (like `img2img`, `upscale`, `removebg`), you need to provide base64-encoded strings:
+
+<Steps>
+  <Step title="Read the image file">
+    ```python
+    with open("input.png", "rb") as f:
+        image_bytes = f.read()
+    ```
+  </Step>
+  
+  <Step title="Encode to base64">
+    ```python
+    import base64
+    
+    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+    ```
+  </Step>
+  
+  <Step title="Pass to API method">
+    ```python
+    result = await api.upscale(image_data=image_base64)
+    ```
+  </Step>
+</Steps>
+
+### Complete example
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+async def upscale_image():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    # Read and encode input image
+    with open("small_image.png", "rb") as f:
+        image_bytes = f.read()
+    
+    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+    
+    # Upscale the image
+    upscaled_data = await api.upscale(image_data=image_base64)
+    
+    # Save the result
+    with open("upscaled_image.png", "wb") as f:
+        f.write(upscaled_data)
+    
+    print("Image upscaled successfully!")
+
+asyncio.run(upscale_image())
+```
+
+## Working with BytesIO
+
+You can work with images in memory using `BytesIO` instead of saving to disk:
+
+```python
+import asyncio
+import base64
+from io import BytesIO
+from kellyapi import KellyAPI
+from PIL import Image
+
+async def generate_and_process():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    # Generate image
+    image_data = await api.generate(
+        prompt="A colorful abstract painting",
+        width=1024,
+        height=1024
+    )
+    
+    # Load into BytesIO
+    image_buffer = BytesIO(image_data)
+    
+    # Open with PIL for processing
+    img = Image.open(image_buffer)
+    
+    # Process the image
+    img = img.resize((512, 512))
+    img = img.convert('RGB')
+    
+    # Save to another BytesIO
+    output_buffer = BytesIO()
+    img.save(output_buffer, format='JPEG', quality=90)
+    output_buffer.seek(0)
+    
+    # Save to file
+    with open("processed.jpg", "wb") as f:
+        f.write(output_buffer.getvalue())
+    
+    print("Image processed and saved!")
+
+asyncio.run(generate_and_process())
+```
+
+<Warning>
+  The SDK imports `BytesIO` from the `io` module but primarily uses it for type hints. When working with image data, you'll typically receive and work with `bytes` objects.
+</Warning>
+
+## Image-to-image editing
+
+The `img2img()` method lets you edit existing images based on a text prompt:
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+async def edit_image():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    # Read and encode source image
+    with open("original.png", "rb") as f:
+        original_bytes = f.read()
+    image_base64 = base64.b64encode(original_bytes).decode('utf-8')
+    
+    # Edit the image
+    edited_data = await api.img2img(
+        prompt="Add a rainbow in the sky",
+        image_data=image_base64,
+        width=1024,
+        height=1024
+    )
+    
+    # Save the edited image
+    with open("edited.png", "wb") as f:
+        f.write(edited_data)
+    
+    print("Image edited successfully!")
+
+asyncio.run(edit_image())
+```
+
+## Background removal
+
+Remove backgrounds from images using the `removebg()` method:
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+async def remove_background():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    # Read and encode input image
+    with open("photo.png", "rb") as f:
+        photo_bytes = f.read()
+    photo_base64 = base64.b64encode(photo_bytes).decode('utf-8')
+    
+    # Remove background
+    no_bg_data = await api.removebg(image_data=photo_base64)
+    
+    # Save as PNG to preserve transparency
+    with open("photo_no_bg.png", "wb") as f:
+        f.write(no_bg_data)
+    
+    print("Background removed successfully!")
+
+asyncio.run(remove_background())
+```
+
+<Note>
+  Always save background-removed images as PNG format to preserve transparency.
+</Note>
+
+## Helper function for image encoding
+
+Create a reusable helper function to encode images:
+
+```python
+import base64
+from pathlib import Path
+
+def encode_image(image_path: str) -> str:
+    """
+    Read an image file and return base64-encoded string.
+    
+    Args:
+        image_path: Path to the image file
+        
+    Returns:
+        Base64-encoded string of the image
+    """
+    with open(image_path, "rb") as f:
+        image_bytes = f.read()
+    return base64.b64encode(image_bytes).decode('utf-8')
+
+def save_image(image_data: bytes, output_path: str):
+    """
+    Save raw image bytes to a file.
+    
+    Args:
+        image_data: Raw image bytes
+        output_path: Path where to save the image
+    """
+    with open(output_path, "wb") as f:
+        f.write(image_data)
+    print(f"Image saved to {output_path}")
+
+# Usage
+async def main():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    # Encode and upscale
+    encoded = encode_image("input.png")
+    upscaled = await api.upscale(image_data=encoded)
+    save_image(upscaled, "output.png")
+```
+
+## Batch processing images
+
+Process multiple images concurrently:
+
+```python
+import asyncio
+import base64
+from pathlib import Path
+from kellyapi import KellyAPI
+
+async def process_images(input_dir: str, output_dir: str):
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    # Get all PNG files
+    input_path = Path(input_dir)
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+    
+    image_files = list(input_path.glob("*.png"))
+    
+    async def upscale_one(image_file):
+        # Read and encode
+        with open(image_file, "rb") as f:
+            image_bytes = f.read()
+        encoded = base64.b64encode(image_bytes).decode('utf-8')
+        
+        # Upscale
+        upscaled = await api.upscale(image_data=encoded)
+        
+        # Save
+        output_file = output_path / f"upscaled_{image_file.name}"
+        with open(output_file, "wb") as f:
+            f.write(upscaled)
+        
+        print(f"Processed {image_file.name}")
+    
+    # Process all images concurrently
+    await asyncio.gather(*[upscale_one(img) for img in image_files])
+    
+    print(f"Processed {len(image_files)} images!")
+
+asyncio.run(process_images("input_images", "output_images"))
+```
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Always use binary mode for image files">
+    When reading or writing image files, always use binary mode (`"rb"` or `"wb"`):
+    
+    ```python
+    # ✅ Correct
+    with open("image.png", "rb") as f:
+        data = f.read()
+    
+    # ❌ Wrong - don't use text mode
+    with open("image.png", "r") as f:
+        data = f.read()
+    ```
+  </Accordion>
+  
+  <Accordion title="Decode base64 strings properly">
+    When encoding images, make sure to decode the base64 bytes to a UTF-8 string:
+    
+    ```python
+    # ✅ Correct
+    encoded = base64.b64encode(image_bytes).decode('utf-8')
+    
+    # ❌ Wrong - returns bytes object
+    encoded = base64.b64encode(image_bytes)
+    ```
+  </Accordion>
+  
+  <Accordion title="Use appropriate image formats">
+    - Use PNG for images with transparency (like background-removed images)
+    - Use JPEG for photographs without transparency
+    - The SDK returns data that can be saved as any format
+  </Accordion>
+  
+  <Accordion title="Handle large images carefully">
+    Large images result in large base64 strings. Consider:
+    - Resizing images before sending them to the API
+    - Processing images in batches rather than all at once
+    - Using appropriate timeout values for large image operations
+  </Accordion>
+</AccordionGroup>
+
+## Image methods reference
+
+All image-related methods in the SDK:
+
+<CardGroup cols={2}>
+  <Card title="generate()" icon="wand-magic-sparkles">
+    Generate images from text prompts
+  </Card>
+  
+  <Card title="img2img()" icon="image">
+    Edit images using text prompts
+  </Card>
+  
+  <Card title="upscale()" icon="up-right-and-down-left-from-center">
+    Upscale images to higher resolution
+  </Card>
+  
+  <Card title="removebg()" icon="scissors">
+    Remove backgrounds from images
+  </Card>
+  
+  <Card title="img2text()" icon="align-left">
+    Describe image contents with text
+  </Card>
+  
+  <Card title="text2write()" icon="pen">
+    Convert text to handwritten images
+  </Card>
+  
+  <Card title="code2image()" icon="code">
+    Convert code to styled images
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="book" href="/api-reference/kellyapi">
+    View detailed API documentation
+  </Card>
+  
+  <Card title="Error handling" icon="triangle-exclamation" href="/guides/error-handling">
+    Handle errors in image operations
+  </Card>
+</CardGroup>

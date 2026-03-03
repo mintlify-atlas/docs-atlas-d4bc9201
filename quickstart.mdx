@@ -1,80 +1,153 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Install the Kelly AI Python SDK and generate your first AI image in minutes
 ---
 
-## Get started in three steps
+This guide will help you get started with the Kelly AI Python SDK. You'll install the package, set up authentication, and generate your first AI image.
 
-Get your documentation site running locally and make your first customization.
+## Prerequisites
 
-### Step 1: Set up your local environment
+- Python 3.7 or higher
+- An API key from [@KellyAIBot](https://t.me/KellyAIBot) on Telegram
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+## Installation
+
+<Steps>
+  <Step title="Install the SDK">
+    Install the Kelly AI Python SDK using pip:
+
+    ```bash
+    pip install kellyapi
+    ```
+
+    The SDK will automatically install its dependencies:
+    - `aiohttp` - For asynchronous HTTP requests
+    - `dotmap` - For convenient response object handling
+  </Step>
+
+  <Step title="Get your API key">
+    If you don't have an API key yet, message [@KellyAIBot](https://t.me/KellyAIBot) on Telegram to get one. See the [authentication guide](/authentication) for detailed instructions.
+  </Step>
+
+  <Step title="Create your first script">
+    Create a new Python file and import the SDK:
+
+    ```python
+    import asyncio
+    from kellyapi import KellyAPI
+
+    async def main():
+        # Initialize the client with your API key
+        client = KellyAPI(api_key="your_api_key_here")
+        
+        # Generate an image
+        image_data = await client.generate(
+            prompt="a beautiful sunset over mountains, photorealistic",
+            model="PhotoPerfect",
+            width=1024,
+            height=1024
+        )
+        
+        # Save the image
+        with open("sunset.png", "wb") as f:
+            f.write(image_data)
+        
+        print("Image saved as sunset.png")
+
+    # Run the async function
+    asyncio.run(main())
+    ```
+
+    <Note>
+    The `generate()` method returns raw binary image data (bytes). You can save it directly to a file or process it with image libraries like PIL.
+    </Note>
+  </Step>
+
+  <Step title="Run your script">
+    Execute your script:
+
+    ```bash
+    python your_script.py
+    ```
+
+    You should see a new file `sunset.png` with your generated image.
+  </Step>
+</Steps>
+
+## Complete example
+
+Here's a more complete example showing multiple SDK features:
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def main():
+    # Initialize the client
+    client = KellyAPI(api_key="your_api_key_here")
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    # List available Stable Diffusion models
+    sd_models = await client.sd_models()
+    print(f"Available SD models: {sd_models}")
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+    # Generate an image
+    image_data = await client.generate(
+        prompt="a cute robot reading a book, digital art",
+        negative_prompt="blurry, low quality, distorted",
+        model="PhotoPerfect",
+        width=1024,
+        height=1024
+    )
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    # Save the generated image
+    with open("robot.png", "wb") as f:
+        f.write(image_data)
+    
+    # Upscale the image
+    with open("robot.png", "rb") as f:
+        original_image = f.read()
+    
+    import base64
+    image_base64 = base64.b64encode(original_image).decode('utf-8')
+    
+    upscaled_data = await client.upscale(image_data=image_base64)
+    
+    # Save the upscaled image
+    with open("robot_upscaled.png", "wb") as f:
+        f.write(upscaled_data)
+    
+    print("Images saved successfully!")
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+asyncio.run(main())
+```
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Authentication" icon="key" href="/authentication">
+    Learn more about API keys and authentication options
+  </Card>
+  <Card title="Image generation" icon="image" href="/features/image-generation">
+    Explore all image generation capabilities and models
+  </Card>
+  <Card title="Language models" icon="messages" href="/features/language-models">
+    Use ChatGPT, Gemini, and other LLMs
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/kellyapi">
+    Browse the complete API documentation
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Common issues
+
+<Warning>
+If you get an `InvalidApiKey` error, make sure you've correctly obtained your API key from [@KellyAIBot](https://t.me/KellyAIBot) and passed it to the `KellyAPI` constructor.
+</Warning>
+
+### Timeout errors
+
+If you're generating large images or using complex prompts, you may need to increase the timeout. The default timeout is 60 seconds.
+
+### Async/await syntax
+
+All SDK methods are asynchronous and must be called with `await` inside an `async` function. If you're new to async Python, check out the [Python asyncio documentation](https://docs.python.org/3/library/asyncio.html).

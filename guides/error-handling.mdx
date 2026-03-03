@@ -1,0 +1,317 @@
+---
+title: Error handling
+description: Learn about error types and how to handle them in the Kelly AI SDK
+---
+
+## Overview
+
+The Kelly AI SDK provides several custom exception classes to help you handle different error scenarios. All errors inherit from a base `BaseError` class (except `InvalidApiKey`).
+
+## Error types
+
+The SDK includes the following error classes defined in `/home/daytona/workspace/source/kellyapi/errors.py`:
+
+### BaseError
+
+The base exception class that all other errors inherit from.
+
+```python
+class BaseError(Exception):
+    message = "An error occurred"
+
+    def __init__(self, error=None):
+        self.success = False
+        self.error_message = error or self.message
+```
+
+<Note>
+  All errors derived from `BaseError` have a `success` attribute set to `False` and an `error_message` attribute containing the error description.
+</Note>
+
+### InvalidApiKey
+
+Raised when the API key is invalid or unauthorized.
+
+```python
+class InvalidApiKey(Exception):
+    pass
+```
+
+**When it's raised:**
+- HTTP status codes 401 or 403
+- Missing or incorrect API key
+
+**Example:**
+```python
+from kellyapi import KellyAPI
+from kellyapi.errors import InvalidApiKey
+
+async def main():
+    api = KellyAPI(api_key="invalid_key")
+    
+    try:
+        result = await api.llm(prompt="Hello")
+    except InvalidApiKey:
+        print("Invalid API key. Get an API key from @KellyAIBot")
+```
+
+### TimeoutError
+
+Raised when a request exceeds the timeout limit (default: 60 seconds).
+
+```python
+class TimeoutError(BaseError):
+    message = "Internal Server Timeout, Please try again later"
+```
+
+**Example:**
+```python
+import asyncio
+from kellyapi import KellyAPI
+from kellyapi.errors import TimeoutError
+
+async def main():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    try:
+        result = await api.generate(
+            prompt="A very complex image",
+            width=2048,
+            height=2048
+        )
+    except TimeoutError:
+        print("Request timed out. Please try again.")
+```
+
+<Accordion title="Where timeout occurs in the code">
+  Timeouts are caught in both the `_fetch` and `_post_json` methods:
+  
+  ```python
+  except asyncio.TimeoutError:
+      raise TimeoutError
+  ```
+  
+  See `/home/daytona/workspace/source/kellyapi/api.py:47-48` and `api.py:71-72`
+</Accordion>
+
+### ConnectionError
+
+Raised when the SDK fails to connect to the Kelly AI API server.
+
+```python
+class ConnectionError(BaseError):
+    message = "Failed to communicate server, Please report this: https://telegram.me/princexsupport"
+```
+
+**When it's raised:**
+- HTTP status code 502
+- `ClientConnectorError` from aiohttp
+- Network connectivity issues
+
+**Example:**
+```python
+from kellyapi import KellyAPI
+from kellyapi.errors import ConnectionError
+
+async def main():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    try:
+        result = await api.llm(prompt="Hello")
+    except ConnectionError:
+        print("Failed to connect to server. Check your internet connection.")
+```
+
+### InvalidContent
+
+Raised when the API returns content that cannot be parsed as JSON.
+
+```python
+class InvalidContent(BaseError):
+    message = "Invalid Content, Please report this: https://telegram.me/princexsupport"
+```
+
+**When it's raised:**
+- `ContentTypeError` from aiohttp
+- Malformed JSON response
+
+**Example:**
+```python
+from kellyapi import KellyAPI
+from kellyapi.errors import InvalidContent
+
+async def main():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    try:
+        result = await api.llm(prompt="Hello")
+    except InvalidContent:
+        print("Received invalid content from API. Please report this issue.")
+```
+
+### InvalidRequest
+
+Raised for invalid API requests.
+
+```python
+class InvalidRequest(BaseError):
+    message = "Invalid Request, Please read docs: https://api.princexd.tech/docs"
+```
+
+### GenericApiError
+
+A catch-all error for general API failures.
+
+```python
+class GenericApiError(BaseError):
+    message = "Api Call Failed, Please report this: https://telegram.me/princexsupport"
+```
+
+## Comprehensive error handling
+
+Here's a complete example showing how to handle all possible errors:
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+from kellyapi.errors import (
+    InvalidApiKey,
+    TimeoutError,
+    ConnectionError,
+    InvalidContent,
+    InvalidRequest,
+    GenericApiError,
+    BaseError
+)
+
+async def generate_image_with_error_handling():
+    api = KellyAPI(api_key="your_api_key_here")
+    
+    try:
+        image_data = await api.generate(
+            prompt="A beautiful sunset over mountains",
+            width=1024,
+            height=1024
+        )
+        
+        # Save the image
+        with open("sunset.png", "wb") as f:
+            f.write(image_data)
+        
+        print("Image generated successfully!")
+        
+    except InvalidApiKey:
+        print("Error: Invalid API key. Get a key from @KellyAIBot")
+        
+    except TimeoutError:
+        print("Error: Request timed out. The server took too long to respond.")
+        
+    except ConnectionError:
+        print("Error: Failed to connect to server. Check your internet.")
+        
+    except InvalidContent:
+        print("Error: Received invalid response from API.")
+        
+    except InvalidRequest:
+        print("Error: Invalid request parameters.")
+        
+    except GenericApiError:
+        print("Error: API call failed.")
+        
+    except BaseError as e:
+        print(f"Error: {e.error_message}")
+        
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+
+asyncio.run(generate_image_with_error_handling())
+```
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Always handle InvalidApiKey">
+    This is the most common error you'll encounter during development. Always check your API key first:
+    
+    ```python
+    try:
+        result = await api.llm(prompt="Hello")
+    except InvalidApiKey:
+        print("Check your API key")
+    ```
+  </Accordion>
+  
+  <Accordion title="Implement retry logic for timeouts">
+    For timeout errors, consider implementing exponential backoff:
+    
+    ```python
+    from tenacity import retry, stop_after_attempt, wait_exponential
+    
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10)
+    )
+    async def generate_with_retry():
+        api = KellyAPI(api_key="your_api_key_here")
+        return await api.generate(prompt="Image")
+    ```
+  </Accordion>
+  
+  <Accordion title="Log errors for debugging">
+    Always log errors with context for easier debugging:
+    
+    ```python
+    import logging
+    
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    
+    try:
+        result = await api.llm(prompt="Hello")
+    except BaseError as e:
+        logger.error(f"API error: {e.error_message}", exc_info=True)
+    ```
+  </Accordion>
+  
+  <Accordion title="Provide user-friendly error messages">
+    Catch specific errors and provide helpful messages to your users:
+    
+    ```python
+    try:
+        result = await api.generate(prompt=user_prompt)
+    except InvalidApiKey:
+        return "Please configure a valid API key in settings"
+    except TimeoutError:
+        return "Generation is taking longer than usual. Please try again."
+    except ConnectionError:
+        return "Cannot reach AI service. Please check your connection."
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Error response structure
+
+When an error occurs, the SDK checks for an error in the API response using the `_parse_result` method:
+
+```python
+def _parse_result(self, response: dict) -> Union[DotMap, List[BytesIO]]:
+    response = DotMap(response)
+    error = response.get("detail")
+    if not error:
+        response.success = True
+    return response
+```
+
+Successful responses will have `success=True`, while error responses will contain a `detail` field with error information.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Async usage" icon="rotate" href="/guides/async-usage">
+    Learn about async/await patterns
+  </Card>
+  
+  <Card title="Working with images" icon="image" href="/guides/working-with-images">
+    Handle image data and file operations
+  </Card>
+</CardGroup>

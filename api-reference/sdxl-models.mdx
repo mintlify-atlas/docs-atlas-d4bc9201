@@ -1,0 +1,54 @@
+---
+title: sdxl_models()
+description: List all available SDXL models for image generation
+---
+
+## Method signature
+
+```python
+async def sdxl_models()
+```
+
+Retrieve a list of all available Stable Diffusion XL (SDXL) models that you can use with the `generate()` method. SDXL models typically offer enhanced image quality and better prompt understanding compared to standard SD models.
+
+## Parameters
+
+This method takes no parameters.
+
+## Returns
+
+<ResponseField name="content" type="dict">
+  A dictionary containing the list of available SDXL models and their details.
+</ResponseField>
+
+## Example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+api = KellyAPI(api_key="your_api_key")
+
+async def list_sdxl_models():
+    # Get all available SDXL models
+    models = await api.sdxl_models()
+    
+    print("Available SDXL models:")
+    print(models)
+    
+    # Use one of the SDXL models for image generation
+    image_data = await api.generate(
+        prompt="A futuristic cityscape at night, highly detailed",
+        model="SDXL_1.0"  # Use an SDXL model from the list
+    )
+
+asyncio.run(list_sdxl_models())
+```
+
+## Notes
+
+- This method is asynchronous and must be awaited
+- The returned SDXL models can be used as the `model` parameter in the `generate()` method
+- SDXL models generally produce higher quality images with better prompt adherence
+- Model availability may change over time; call this method to get the current list
+- For standard Stable Diffusion models, use the `sd_models()` method instead

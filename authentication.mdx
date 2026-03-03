@@ -1,0 +1,185 @@
+---
+title: Authentication
+description: Learn how to get your API key and authenticate requests with the Kelly AI Python SDK
+---
+
+The Kelly AI Python SDK uses API keys to authenticate requests. You'll need an API key to use any of the SDK's features.
+
+## Getting your API key
+
+<Steps>
+  <Step title="Message the bot">
+    Contact [@KellyAIBot](https://t.me/KellyAIBot) on Telegram to request your API key.
+  </Step>
+
+  <Step title="Receive your key">
+    The bot will provide you with a unique API key. Keep this key secure—don't share it publicly or commit it to version control.
+  </Step>
+
+  <Step title="Use your key">
+    Pass your API key to the `KellyAPI` constructor when initializing the client.
+  </Step>
+</Steps>
+
+## Initializing the client
+
+### Basic initialization
+
+The simplest way to initialize the Kelly AI client is by passing your API key directly:
+
+```python
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your_api_key_here")
+```
+
+### Using environment variables
+
+For better security, store your API key in an environment variable:
+
+<CodeGroup>
+```python Python
+import os
+from kellyapi import KellyAPI
+
+# Read API key from environment variable
+api_key = os.getenv("KELLY_API_KEY")
+client = KellyAPI(api_key=api_key)
+```
+
+```bash .env file
+KELLY_API_KEY=your_api_key_here
+```
+
+```python Using python-dotenv
+import os
+from dotenv import load_dotenv
+from kellyapi import KellyAPI
+
+# Load environment variables from .env file
+load_dotenv()
+
+api_key = os.getenv("KELLY_API_KEY")
+client = KellyAPI(api_key=api_key)
+```
+</CodeGroup>
+
+<Warning>
+Never hardcode your API key in production code. Always use environment variables or a secure secrets management system.
+</Warning>
+
+## Configuration options
+
+The `KellyAPI` class accepts several configuration parameters:
+
+```python
+from kellyapi import KellyAPI
+import aiohttp
+
+client = KellyAPI(
+    api_key="your_api_key_here",      # Required: Your API key
+    api="https://api.kellyai.pro/",    # Optional: Custom API endpoint
+    session=aiohttp.ClientSession      # Optional: Custom aiohttp session
+)
+```
+
+### Parameters
+
+<ParamField path="api_key" type="string" required>
+  Your Kelly AI API key obtained from [@KellyAIBot](https://t.me/KellyAIBot)
+</ParamField>
+
+<ParamField path="api" type="string" default="https://api.kellyai.pro/">
+  The base URL for the Kelly AI API. You typically don't need to change this unless you're using a custom endpoint.
+</ParamField>
+
+<ParamField path="session" type="aiohttp.ClientSession" default="aiohttp.ClientSession">
+  A custom `aiohttp.ClientSession` class for advanced use cases. Useful if you need to configure custom timeouts, proxies, or connection pooling.
+</ParamField>
+
+## Using a custom session
+
+For advanced scenarios, you can provide your own `aiohttp.ClientSession` configuration:
+
+```python
+import aiohttp
+from kellyapi import KellyAPI
+
+# Create a custom session class with specific settings
+class CustomSession(aiohttp.ClientSession):
+    def __init__(self, *args, **kwargs):
+        kwargs['timeout'] = aiohttp.ClientTimeout(total=120)  # 2 minute timeout
+        kwargs['connector'] = aiohttp.TCPConnector(limit=100)
+        super().__init__(*args, **kwargs)
+
+client = KellyAPI(
+    api_key="your_api_key_here",
+    session=CustomSession
+)
+```
+
+## Authentication errors
+
+The SDK will raise an `InvalidApiKey` exception if your API key is invalid or unauthorized:
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+from kellyapi.errors import InvalidApiKey
+
+async def main():
+    client = KellyAPI(api_key="invalid_key")
+    
+    try:
+        await client.generate(prompt="test")
+    except InvalidApiKey as e:
+        print(f"Authentication failed: {e}")
+        print("Get an API key from @KellyAIBot")
+
+asyncio.run(main())
+```
+
+The error message will be:
+```
+Invalid API key, Get an api key from @KellyAIBot
+```
+
+<Note>
+Authentication is checked on every API request. If you receive a 401 or 403 status code, the SDK will automatically raise an `InvalidApiKey` exception.
+</Note>
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Secure storage" icon="lock">
+    Store API keys in environment variables or secrets management systems, never in code.
+  </Card>
+  <Card title="Separate keys" icon="key">
+    Use different API keys for development, staging, and production environments.
+  </Card>
+  <Card title="Key rotation" icon="rotate">
+    Regularly rotate your API keys and update them across your applications.
+  </Card>
+  <Card title="Access control" icon="shield">
+    Limit who has access to your API keys within your organization.
+  </Card>
+</CardGroup>
+
+## Next steps
+
+Now that you understand authentication, you're ready to explore the SDK's features:
+
+<CardGroup cols={2}>
+  <Card title="Image generation" icon="image" href="/features/image-generation">
+    Generate images with Stable Diffusion and SDXL models
+  </Card>
+  <Card title="Language models" icon="messages" href="/features/language-models">
+    Use ChatGPT, Gemini, and other LLMs for text generation
+  </Card>
+  <Card title="Image tools" icon="wand-magic-sparkles" href="/features/image-tools">
+    Upscale images, remove backgrounds, and more
+  </Card>
+  <Card title="Voice synthesis" icon="microphone" href="/features/voice-synthesis">
+    Convert text to speech with multiple voice models
+  </Card>
+</CardGroup>

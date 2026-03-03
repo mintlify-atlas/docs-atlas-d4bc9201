@@ -1,0 +1,115 @@
+---
+title: code2image()
+description: Convert code to a beautifully formatted image
+---
+
+## Overview
+
+The `code2image()` method converts your code into a beautifully formatted image with syntax highlighting. This is perfect for creating code snippets for social media, presentations, or documentation.
+
+## Method signature
+
+```python
+await client.code2image(text: str)
+```
+
+## Parameters
+
+<ParamField path="text" type="str" required>
+  The code you want to convert to an image
+</ParamField>
+
+## Returns
+
+Returns binary image data (bytes) containing the formatted code image in PNG format.
+
+## Code example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    # Convert code to image
+    code = """
+def hello_world():
+    print("Hello, World!")
+    return True
+"""
+    
+    image_data = await client.code2image(text=code)
+    
+    # Save the code image
+    with open("code_snippet.png", "wb") as f:
+        f.write(image_data)
+    
+    print("Code image saved successfully!")
+
+asyncio.run(main())
+```
+
+## Advanced usage
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    # Convert JavaScript code to image
+    js_code = """
+const greeting = (name) => {
+    console.log(`Hello, ${name}!`);
+    return true;
+};
+
+greeting("World");
+"""
+    
+    image_data = await client.code2image(text=js_code)
+    
+    # Save with a specific filename
+    with open("javascript_snippet.png", "wb") as f:
+        f.write(image_data)
+    
+    print("JavaScript code image created!")
+
+asyncio.run(main())
+```
+
+## Error handling
+
+```python
+import asyncio
+from kellyapi import KellyAPI, InvalidApiKey, TimeoutError, ConnectionError
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    try:
+        code = "print('Hello, World!')"
+        image_data = await client.code2image(text=code)
+        
+        with open("code.png", "wb") as f:
+            f.write(image_data)
+            
+    except InvalidApiKey:
+        print("Invalid API key. Get an API key from @KellyAIBot")
+    except TimeoutError:
+        print("Request timed out. Please try again later")
+    except ConnectionError:
+        print("Failed to connect to server")
+
+asyncio.run(main())
+```
+
+## Notes
+
+- The method is asynchronous and must be awaited
+- The returned image data is in PNG format
+- Syntax highlighting is automatically applied based on the code content
+- Works with any programming language
+- You can save the image data directly to a file or process it further

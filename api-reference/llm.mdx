@@ -1,0 +1,138 @@
+---
+title: "llm()"
+description: "Generate chat responses using various language models"
+---
+
+## llm()
+
+Generate conversational responses using different language models including ChatGPT, Gemini, Gemma, and KellyAI. This method allows you to customize the AI's personality through the character parameter.
+
+### Method signature
+
+```python
+await client.llm(
+    prompt: str,
+    model: str = "chatgpt",
+    character: str = "KelyAI"
+)
+```
+
+### Parameters
+
+<ParamField path="prompt" type="str" required>
+  The user message or question you want the language model to respond to. This can be a question, instruction, or conversation prompt.
+</ParamField>
+
+<ParamField path="model" type="str" default="chatgpt">
+  The language model to use for generating the response. Available options include:
+  - `"chatgpt"` - OpenAI's ChatGPT model
+  - `"gemini"` - Google's Gemini model
+  - `"gemma"` - Google's Gemma model
+  - `"kellyai"` - Kelly AI's custom model
+  
+  Use the `llm_models()` method to get the complete list of available models.
+</ParamField>
+
+<ParamField path="character" type="str" default="KelyAI">
+  The personality or character the AI should adopt when responding. This parameter allows you to customize the tone and style of responses. You can specify any character name or personality type to influence the AI's behavior.
+</ParamField>
+
+### Returns
+
+<ResponseField name="message" type="str">
+  The generated text response from the language model as a string.
+</ResponseField>
+
+### Usage examples
+
+#### Basic usage with ChatGPT
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    response = await client.llm(
+        prompt="What is the capital of France?"
+    )
+    print(response)
+
+asyncio.run(main())
+```
+
+#### Using Google Gemini
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    response = await client.llm(
+        prompt="Explain quantum computing in simple terms",
+        model="gemini"
+    )
+    print(response)
+
+asyncio.run(main())
+```
+
+#### Using Gemma model
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    response = await client.llm(
+        prompt="Write a short poem about the ocean",
+        model="gemma"
+    )
+    print(response)
+
+asyncio.run(main())
+```
+
+#### Using KellyAI with custom character
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    response = await client.llm(
+        prompt="Give me advice for learning Python",
+        model="kellyai",
+        character="Expert Python Developer"
+    )
+    print(response)
+
+asyncio.run(main())
+```
+
+#### Customizing character personality
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    # Use a friendly tutor character
+    response = await client.llm(
+        prompt="How do I improve my code quality?",
+        model="chatgpt",
+        character="Friendly Coding Tutor"
+    )
+    print(response)
+
+asyncio.run(main())
+```

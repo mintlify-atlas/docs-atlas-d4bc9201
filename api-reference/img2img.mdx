@@ -1,0 +1,87 @@
+---
+title: img2img()
+description: Transform existing images using text prompts with image-to-image generation
+---
+
+## Method signature
+
+```python
+async def img2img(
+    prompt: str,
+    image_data: str,
+    negative_prompt: str = "canvas frame, cartoon, 3d, ((disfigured)), ((bad art)), ((deformed)),((extra limbs)),((close up)),((b&w)), weird colors, blurry, (((duplicate))), ((morbid)), ((mutilated)), [out of frame], extra fingers, mutated hands, ((poorly drawn hands)), ((poorly drawn face)), (((mutation))), (((deformed))), ((ugly)), blurry, ((bad anatomy)), (((bad proportions))), ((extra limbs)), cloned face, (((disfigured))), out of frame, ugly, extra limbs, (bad anatomy), gross proportions, (malformed limbs), ((missing arms)), ((missing legs)), (((extra arms))), (((extra legs))), mutated hands, (fused fingers), (too many fingers), (((long neck))), Photoshop, video game, ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, mutation, mutated, extra limbs, extra legs, extra arms, disfigured, deformed, cross-eye, body out of frame, blurry, bad art, bad anatomy, nsfw",
+    width: str = 1024,
+    height: str = 1024,
+)
+```
+
+Transform an existing image using a text prompt. This image-to-image method modifies your input image based on the description provided, maintaining the general structure while applying the requested changes.
+
+## Parameters
+
+<ParamField path="prompt" type="str" required>
+  The text description of how you want to transform the image. Describe the desired changes or style.
+</ParamField>
+
+<ParamField path="image_data" type="str" required>
+  The base64-encoded string representation of the input image you want to transform.
+</ParamField>
+
+<ParamField path="negative_prompt" type="str" default="canvas frame, cartoon, 3d, ((disfigured))...">
+  Text describing what you don't want in the transformed image. The default value includes common undesirable elements like distortions, poor anatomy, and NSFW content.
+</ParamField>
+
+<ParamField path="width" type="str" default="1024">
+  The width of the output image in pixels.
+</ParamField>
+
+<ParamField path="height" type="str" default="1024">
+  The height of the output image in pixels.
+</ParamField>
+
+## Returns
+
+<ResponseField name="image_data" type="bytes">
+  The transformed image as decoded binary data. The API returns base64-encoded data which is automatically decoded to bytes for you.
+</ResponseField>
+
+## Example
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+api = KellyAPI(api_key="your_api_key")
+
+async def transform_image():
+    # Load and encode the input image
+    with open("original.png", "rb") as f:
+        image_bytes = f.read()
+        image_data = base64.b64encode(image_bytes).decode("utf-8")
+    
+    # Transform the image
+    result = await api.img2img(
+        prompt="Convert to oil painting style, vibrant colors",
+        image_data=image_data,
+        negative_prompt="blurry, distorted, low quality",
+        width=1024,
+        height=1024
+    )
+    
+    # Save the transformed image
+    with open("transformed.png", "wb") as f:
+        f.write(result)
+    
+    print("Image transformed successfully!")
+
+asyncio.run(transform_image())
+```
+
+## Notes
+
+- The input `image_data` parameter must be a base64-encoded string
+- The method automatically sets `responseType="base64data"` internally and decodes the response for you
+- All image-to-image operations are asynchronous and must be awaited
+- The transformation maintains the general composition of the input image while applying the style or changes described in the prompt
+- The default negative prompt helps avoid common generation issues

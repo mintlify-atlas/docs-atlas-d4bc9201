@@ -1,0 +1,87 @@
+---
+title: "Client"
+description: "Initialize the Kelly AI Python SDK client"
+---
+
+## KellyAPI
+
+The main client class for interacting with the Kelly AI API. You initialize this class to create a client instance that handles all API requests.
+
+### Initialization
+
+```python
+from kellyapi import KellyAPI
+
+# Basic initialization with API key
+client = KellyAPI(api_key="your-api-key")
+
+# Initialize with custom API endpoint
+client = KellyAPI(
+    api_key="your-api-key",
+    api="https://custom-endpoint.kellyai.pro/"
+)
+
+# Initialize with custom aiohttp session
+import aiohttp
+session = aiohttp.ClientSession()
+client = KellyAPI(
+    api_key="your-api-key",
+    session=session
+)
+```
+
+### Parameters
+
+<ParamField path="api_key" type="str" default="None">
+  Your Kelly AI API key. You can obtain this from your Kelly AI dashboard. If not provided, you may need to set it through environment variables or other configuration methods.
+</ParamField>
+
+<ParamField path="api" type="str" default="https://api.kellyai.pro/">
+  The base URL for the Kelly AI API endpoint. You typically don't need to change this unless you're using a custom or enterprise endpoint.
+</ParamField>
+
+<ParamField path="session" type="aiohttp.ClientSession" default="None">
+  An optional aiohttp ClientSession instance for making HTTP requests. If not provided, the client will create a new session automatically. You can pass your own session to manage connection pooling or configure custom headers.
+</ParamField>
+
+### Usage examples
+
+#### Basic usage
+
+```python
+from kellyapi import KellyAPI
+
+# Initialize the client
+client = KellyAPI(api_key="your-api-key")
+
+# Now you can use the client to make API calls
+```
+
+#### Using environment variables
+
+```python
+import os
+from kellyapi import KellyAPI
+
+# Get API key from environment
+api_key = os.getenv("KELLY_API_KEY")
+client = KellyAPI(api_key=api_key)
+```
+
+#### Custom session configuration
+
+```python
+import aiohttp
+from kellyapi import KellyAPI
+
+# Create a custom session with specific settings
+session = aiohttp.ClientSession(
+    timeout=aiohttp.ClientTimeout(total=30),
+    headers={"User-Agent": "MyApp/1.0"}
+)
+
+client = KellyAPI(
+    api_key="your-api-key",
+    session=session
+)
+```

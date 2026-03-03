@@ -1,0 +1,53 @@
+---
+title: voice2text()
+description: Convert speech audio to text using speech recognition
+---
+
+## Method signature
+
+```python
+async def voice2text(audio: str)
+```
+
+Transcribe speech audio to text using speech recognition.
+
+## Parameters
+
+<ParamField path="audio" type="str" required>
+  The audio data in base64-encoded string format. You need to encode your audio file to base64 before passing it to this method
+</ParamField>
+
+## Returns
+
+<ResponseField name="result" type="str">
+  The transcribed text from the audio input
+</ResponseField>
+
+## Example
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+api = KellyAPI(api_key="your_api_key")
+
+async def main():
+    # Read and encode audio file
+    with open("audio.wav", "rb") as f:
+        audio_bytes = f.read()
+        audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
+    
+    # Transcribe audio to text
+    transcription = await api.voice2text(audio=audio_base64)
+    print(f"Transcription: {transcription}")
+
+asyncio.run(main())
+```
+
+## Notes
+
+- The audio parameter must be a base64-encoded string
+- The method returns the transcribed text as a string
+- Supported audio formats depend on the API's speech recognition capabilities
+- Make sure to encode your audio file to base64 before passing it to this method

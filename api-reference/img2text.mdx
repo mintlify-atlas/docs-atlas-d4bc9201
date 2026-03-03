@@ -1,0 +1,131 @@
+---
+title: "img2text()"
+description: "Generate text descriptions from images"
+---
+
+## img2text()
+
+Generate descriptive text from images using AI vision models. You can provide a prompt to guide the type of description or analysis you want from the image.
+
+### Method signature
+
+```python
+await client.img2text(
+    prompt: str,
+    image_data: str
+)
+```
+
+### Parameters
+
+<ParamField path="prompt" type="str" required>
+  The instruction or question about the image. This guides what kind of description or analysis you want. For example, "Describe this image", "What objects are in this image?", or "What is the main subject of this photo?"
+</ParamField>
+
+<ParamField path="image_data" type="str" required>
+  The image data encoded as a base64 string. You need to convert your image to base64 format before passing it to this method.
+</ParamField>
+
+### Returns
+
+<ResponseField name="content" type="str">
+  The generated text description or analysis of the image based on your prompt.
+</ResponseField>
+
+### Usage examples
+
+#### Basic image description
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    # Read and encode the image
+    with open("photo.jpg", "rb") as image_file:
+        image_data = base64.b64encode(image_file.read()).decode("utf-8")
+    
+    # Get image description
+    description = await client.img2text(
+        prompt="Describe this image in detail",
+        image_data=image_data
+    )
+    print(description)
+
+asyncio.run(main())
+```
+
+#### Identify objects in image
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    # Read and encode the image
+    with open("scene.jpg", "rb") as image_file:
+        image_data = base64.b64encode(image_file.read()).decode("utf-8")
+    
+    # Identify objects
+    objects = await client.img2text(
+        prompt="List all the objects you can see in this image",
+        image_data=image_data
+    )
+    print(objects)
+
+asyncio.run(main())
+```
+
+#### Analyze image content
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    # Read and encode the image
+    with open("artwork.jpg", "rb") as image_file:
+        image_data = base64.b64encode(image_file.read()).decode("utf-8")
+    
+    # Analyze the image
+    analysis = await client.img2text(
+        prompt="What is the mood and style of this artwork?",
+        image_data=image_data
+    )
+    print(analysis)
+
+asyncio.run(main())
+```
+
+#### Extract text from image
+
+```python
+import asyncio
+import base64
+from kellyapi import KellyAPI
+
+client = KellyAPI(api_key="your-api-key")
+
+async def main():
+    # Read and encode the image
+    with open("document.jpg", "rb") as image_file:
+        image_data = base64.b64encode(image_file.read()).decode("utf-8")
+    
+    # Extract text
+    text = await client.img2text(
+        prompt="Extract and transcribe all text from this image",
+        image_data=image_data
+    )
+    print(text)
+
+asyncio.run(main())
+```

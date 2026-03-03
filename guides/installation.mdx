@@ -1,0 +1,91 @@
+---
+title: Installation
+description: Install the Kelly AI Python SDK via pip
+---
+
+## Requirements
+
+The Kelly AI Python SDK requires Python 3.7 or higher. The SDK is compatible with:
+
+- Python 3.7
+- Python 3.8
+- Python 3.9
+- Python 3.10
+- Python 3.11
+
+## Install via pip
+
+You can install the Kelly AI SDK using pip:
+
+```bash
+pip install kellyapi
+```
+
+<Note>
+  Make sure you have pip installed and updated to the latest version:
+  ```bash
+  pip install --upgrade pip
+  ```
+</Note>
+
+## Verify installation
+
+After installation, verify that the SDK is installed correctly:
+
+```python
+import kellyapi
+print(kellyapi.__name__)  # Should output: kellyapi
+```
+
+## Dependencies
+
+The SDK automatically installs the following dependencies:
+
+- **aiohttp** - For async HTTP requests
+- **dotmap** - For convenient dictionary access
+
+<Warning>
+  The Kelly AI SDK uses async/await syntax and requires an event loop to run. If you're not familiar with asyncio, check out the [async usage guide](/guides/async-usage).
+</Warning>
+
+## Virtual environment (recommended)
+
+It's recommended to install the SDK in a virtual environment to avoid dependency conflicts:
+
+<Steps>
+  <Step title="Create a virtual environment">
+    ```bash
+    python -m venv venv
+    ```
+  </Step>
+  
+  <Step title="Activate the virtual environment">
+    <CodeGroup>
+      ```bash Linux/macOS
+      source venv/bin/activate
+      ```
+      
+      ```bash Windows
+      venv\Scripts\activate
+      ```
+    </CodeGroup>
+  </Step>
+  
+  <Step title="Install the SDK">
+    ```bash
+    pip install kellyapi
+    ```
+  </Step>
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Async usage" icon="rotate" href="/guides/async-usage">
+    Learn how to use async/await with the SDK
+  </Card>
+  
+  <Card title="Error handling" icon="triangle-exclamation" href="/guides/error-handling">
+    Handle errors and exceptions properly
+  </Card>
+</CardGroup>

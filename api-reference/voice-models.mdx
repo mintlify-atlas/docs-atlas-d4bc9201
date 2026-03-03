@@ -1,0 +1,55 @@
+---
+title: voice_models()
+description: List all available voice models for text-to-speech
+---
+
+## Method signature
+
+```python
+async def voice_models()
+```
+
+Retrieve a list of all 49 available voice models that can be used with the `text2voice()` method.
+
+## Parameters
+
+This method takes no parameters.
+
+## Returns
+
+<ResponseField name="models" type="list">
+  A list of all available voice models with their details. Each model includes information such as the model identifier, language, and voice characteristics
+</ResponseField>
+
+## Example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+api = KellyAPI(api_key="your_api_key")
+
+async def main():
+    # Get all available voice models
+    models = await api.voice_models()
+    
+    # Display available models
+    print("Available voice models:")
+    for model in models:
+        print(model)
+    
+    # Use a model for text-to-speech
+    audio_data = await api.text2voice(
+        text="Hello!",
+        model=models[0]  # Use the first model from the list
+    )
+
+asyncio.run(main())
+```
+
+## Notes
+
+- There are 49 voice models available in total
+- The default voice model used by `text2voice()` is `en-US_LisaExpressive`
+- Each model represents a different voice with unique language and accent characteristics
+- Use this method to discover available voices before calling `text2voice()`

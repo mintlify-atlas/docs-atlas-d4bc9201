@@ -1,0 +1,144 @@
+---
+title: Image generation
+description: Generate high-quality images using Stable Diffusion and SDXL models
+---
+
+Generate stunning images from text prompts using advanced AI models including Stable Diffusion and SDXL. Kelly AI provides access to multiple pre-trained models optimized for different styles and use cases.
+
+## Generate an image
+
+Create images from text descriptions using the `generate()` method.
+
+<Steps>
+  <Step title="Import and initialize">
+    ```python
+    from kellyapi import KellyAPI
+
+    kelly = KellyAPI(api_key="your_api_key")
+    ```
+  </Step>
+
+  <Step title="Generate your image">
+    ```python
+    image_data = await kelly.generate(
+        prompt="A serene mountain landscape at sunset",
+        model="PhotoPerfect",
+        width=1024,
+        height=1024
+    )
+    ```
+  </Step>
+
+  <Step title="Save the result">
+    ```python
+    with open("output.png", "wb") as f:
+        f.write(image_data)
+    ```
+  </Step>
+</Steps>
+
+## Parameters
+
+<ParamField path="prompt" type="str" required>
+  The text description of the image you want to generate. Be specific and descriptive for best results.
+</ParamField>
+
+<ParamField path="negative_prompt" type="str" default="canvas frame, cartoon, 3d, ((disfigured)), ((bad art))...">
+  Describes what you don't want in the image. The default value excludes common unwanted elements like distorted anatomy, bad art, blurriness, and NSFW content.
+</ParamField>
+
+<ParamField path="model" type="str" default="PhotoPerfect">
+  The AI model to use for generation. Different models excel at different styles.
+</ParamField>
+
+<ParamField path="width" type="int" default="1024">
+  Image width in pixels. Common values: 512, 768, 1024.
+</ParamField>
+
+<ParamField path="height" type="int" default="1024">
+  Image height in pixels. Common values: 512, 768, 1024.
+</ParamField>
+
+## Available models
+
+Retrieve the list of available models for your API key.
+
+<CodeGroup>
+```python Stable Diffusion models
+models = await kelly.sd_models()
+print(models)
+```
+
+```python SDXL models
+models = await kelly.sdxl_models()
+print(models)
+```
+</CodeGroup>
+
+## Complete example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def generate_image():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # Generate a detailed image
+    image_data = await kelly.generate(
+        prompt="A futuristic cityscape with flying cars, neon lights, and towering skyscrapers, cyberpunk style, highly detailed",
+        negative_prompt="blurry, low quality, distorted",
+        model="PhotoPerfect",
+        width=1024,
+        height=768
+    )
+    
+    # Save the image
+    with open("cityscape.png", "wb") as f:
+        f.write(image_data)
+    
+    print("Image generated successfully!")
+
+# Run the async function
+asyncio.run(generate_image())
+```
+
+## Use cases
+
+### Portrait generation
+
+```python
+image_data = await kelly.generate(
+    prompt="Professional headshot of a confident business woman, studio lighting, sharp focus",
+    width=512,
+    height=768
+)
+```
+
+### Artistic landscapes
+
+```python
+image_data = await kelly.generate(
+    prompt="Fantasy landscape with floating islands, waterfalls, magical atmosphere, oil painting style",
+    width=1024,
+    height=576
+)
+```
+
+### Product visualization
+
+```python
+image_data = await kelly.generate(
+    prompt="Modern wireless headphones on a clean white background, product photography, studio lighting",
+    width=1024,
+    height=1024
+)
+```
+
+<Note>
+  The `generate()` method returns raw image data as bytes. Save it to a file or convert it to a PIL Image object for further processing.
+</Note>
+
+<Tip>
+  For best results, use detailed prompts with specific descriptors like lighting conditions, art styles, and quality indicators (e.g., "highly detailed", "sharp focus", "professional photography").
+</Tip>

@@ -1,0 +1,260 @@
+---
+title: Errors
+description: Error classes and exceptions in Kelly AI Python SDK
+---
+
+## Overview
+
+The Kelly AI Python SDK defines several error classes to help you handle different failure scenarios. All errors except `InvalidApiKey` inherit from the `BaseError` class.
+
+## Error classes
+
+### BaseError
+
+The base exception class that all other errors inherit from (except `InvalidApiKey`).
+
+```python
+class BaseError(Exception):
+    message = "An error occurred"
+```
+
+**Attributes:**
+- `success`: Always set to `False`
+- `error_message`: The error message, either custom or the default message
+
+**Usage:**
+```python
+try:
+    # API call
+    result = await client.generate(prompt="test")
+except BaseError as e:
+    print(f"Error: {e.error_message}")
+    print(f"Success: {e.success}")  # False
+```
+
+### TimeoutError
+
+Raised when the API request exceeds the timeout limit.
+
+**Message:** `"Internal Server Timeout, Please try again later"`
+
+**When raised:**
+- When an `asyncio.TimeoutError` occurs during the API request
+- Default timeout is 60 seconds for most methods
+
+**Usage:**
+```python
+import asyncio
+from kellyapi import KellyAPI, TimeoutError
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    try:
+        result = await client.generate(prompt="A beautiful landscape")
+    except TimeoutError:
+        print("Request timed out. Please try again later")
+
+asyncio.run(main())
+```
+
+### InvalidRequest
+
+Raised when the API request is invalid or malformed.
+
+**Message:** `"Invalid Request, Please read docs: https://api.princexd.tech/docs"`
+
+**When raised:**
+- When the request parameters are invalid or missing required fields
+- When the request format is incorrect
+
+**Usage:**
+```python
+import asyncio
+from kellyapi import KellyAPI, InvalidRequest
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    try:
+        # Invalid request example
+        result = await client.llm(prompt="", model="invalid_model")
+    except InvalidRequest:
+        print("Invalid request. Please check the documentation")
+
+asyncio.run(main())
+```
+
+### InvalidContent
+
+Raised when the API returns content that cannot be processed.
+
+**Message:** `"Invalid Content, Please report this: https://telegram.me/princexsupport"`
+
+**When raised:**
+- When an `aiohttp.ContentTypeError` occurs
+- When the response content type is unexpected or cannot be parsed as JSON
+
+**Usage:**
+```python
+import asyncio
+from kellyapi import KellyAPI, InvalidContent
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    try:
+        result = await client.sd_models()
+    except InvalidContent:
+        print("Invalid content received. Please report this issue")
+
+asyncio.run(main())
+```
+
+### GenericApiError
+
+Raised when a generic API error occurs that doesn't fit other categories.
+
+**Message:** `"Api Call Failed, Please report this: https://telegram.me/princexsupport"`
+
+**When raised:**
+- When the API call fails for an unspecified reason
+- Generic fallback for unexpected API errors
+
+**Usage:**
+```python
+import asyncio
+from kellyapi import KellyAPI, GenericApiError
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    try:
+        result = await client.upscale(image_data="base64_data")
+    except GenericApiError:
+        print("API call failed. Please report this issue")
+
+asyncio.run(main())
+```
+
+### ConnectionError
+
+Raised when the SDK cannot establish a connection to the API server.
+
+**Message:** `"Failed to communicate server, Please report this: https://telegram.me/princexsupport"`
+
+**When raised:**
+- When an `aiohttp.ClientConnectorError` occurs
+- When the API returns a 502 status code
+- Network connectivity issues
+
+**Usage:**
+```python
+import asyncio
+from kellyapi import KellyAPI, ConnectionError
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    try:
+        result = await client.llm(prompt="Hello")
+    except ConnectionError:
+        print("Failed to connect to server. Please check your internet connection")
+
+asyncio.run(main())
+```
+
+### InvalidApiKey
+
+Raised when the API key is invalid or unauthorized.
+
+**When raised:**
+- When the API returns a 401 (Unauthorized) status code
+- When the API returns a 403 (Forbidden) status code
+- When the API key is missing, invalid, or expired
+
+**Note:** This exception does **not** inherit from `BaseError`. It directly inherits from Python's built-in `Exception` class.
+
+**Usage:**
+```python
+import asyncio
+from kellyapi import KellyAPI, InvalidApiKey
+
+async def main():
+    client = KellyAPI(api_key="invalid_key")
+    
+    try:
+        result = await client.generate(prompt="A beautiful sunset")
+    except InvalidApiKey as e:
+        print(f"Authentication failed: {e}")
+        print("Get an API key from @KellyAIBot")
+
+asyncio.run(main())
+```
+
+## Comprehensive error handling
+
+Here's an example of handling all possible errors in a single try-except block:
+
+```python
+import asyncio
+from kellyapi import (
+    KellyAPI,
+    BaseError,
+    TimeoutError,
+    InvalidRequest,
+    InvalidContent,
+    GenericApiError,
+    ConnectionError,
+    InvalidApiKey
+)
+
+async def main():
+    client = KellyAPI(api_key="your_api_key")
+    
+    try:
+        # Attempt to generate an image
+        image_data = await client.generate(
+            prompt="A serene mountain landscape",
+            model="PhotoPerfect",
+            width=1024,
+            height=1024
+        )
+        
+        # Save the image
+        with open("output.png", "wb") as f:
+            f.write(image_data)
+        
+        print("Image generated successfully!")
+        
+    except InvalidApiKey:
+        print("Error: Invalid API key. Get one from @KellyAIBot")
+    except TimeoutError:
+        print("Error: Request timed out. Please try again later")
+    except InvalidRequest:
+        print("Error: Invalid request. Check the documentation")
+    except InvalidContent:
+        print("Error: Invalid content received. Please report this")
+    except ConnectionError:
+        print("Error: Cannot connect to server. Check your internet")
+    except GenericApiError:
+        print("Error: API call failed. Please report this")
+    except BaseError as e:
+        print(f"Error: {e.error_message}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
+asyncio.run(main())
+```
+
+## Best practices
+
+1. **Always handle `InvalidApiKey` first**: This error is most common when setting up the SDK
+
+2. **Use specific exceptions**: Catch specific exceptions before catching `BaseError` to provide better error messages
+
+3. **Log errors appropriately**: Use the `error_message` attribute from `BaseError` for logging
+
+4. **Implement retry logic**: For `TimeoutError` and `ConnectionError`, consider implementing exponential backoff retry logic
+
+5. **Report persistent issues**: If you encounter `InvalidContent` or `GenericApiError` frequently, report them to support

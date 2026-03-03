@@ -1,0 +1,203 @@
+---
+title: Language models
+description: Access ChatGPT, Gemini, Gemma, and KellyAI language models for text generation
+---
+
+Generate human-like text responses using state-of-the-art language models. Kelly AI provides access to multiple LLMs including ChatGPT, Google Gemini, Gemma, and custom KellyAI models.
+
+## Generate text
+
+Use the `llm()` method to generate text responses from AI language models.
+
+<Steps>
+  <Step title="Import and initialize">
+    ```python
+    from kellyapi import KellyAPI
+
+    kelly = KellyAPI(api_key="your_api_key")
+    ```
+  </Step>
+
+  <Step title="Send your prompt">
+    ```python
+    response = await kelly.llm(
+        prompt="Explain quantum computing in simple terms",
+        model="chatgpt",
+        character="KellyAI"
+    )
+    ```
+  </Step>
+
+  <Step title="Use the response">
+    ```python
+    print(response)
+    ```
+  </Step>
+</Steps>
+
+## Parameters
+
+<ParamField path="prompt" type="str" required>
+  Your question or instruction for the language model.
+</ParamField>
+
+<ParamField path="model" type="str" default="chatgpt">
+  The language model to use. Available options include `chatgpt`, `gemini`, `gemma`, and other models.
+</ParamField>
+
+<ParamField path="character" type="str" default="KellyAI">
+  The character or personality the AI should adopt when responding.
+</ParamField>
+
+## Available models
+
+Retrieve the list of available language models:
+
+```python
+models = await kelly.llm_models()
+print(models)
+```
+
+This returns all language models accessible with your API key.
+
+## Complete example
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def chat():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    # Get available models
+    models = await kelly.llm_models()
+    print("Available models:", models)
+    
+    # Generate a response
+    response = await kelly.llm(
+        prompt="Write a short poem about artificial intelligence",
+        model="chatgpt",
+        character="KellyAI"
+    )
+    
+    print("\nAI Response:")
+    print(response)
+
+# Run the async function
+asyncio.run(chat())
+```
+
+## Use cases
+
+### Question answering
+
+Get informative answers to your questions:
+
+```python
+response = await kelly.llm(
+    prompt="What are the benefits of renewable energy?",
+    model="chatgpt"
+)
+print(response)
+```
+
+### Content generation
+
+Create original content:
+
+```python
+response = await kelly.llm(
+    prompt="Write a product description for eco-friendly water bottles",
+    model="gemini"
+)
+print(response)
+```
+
+### Code assistance
+
+Get help with programming:
+
+```python
+response = await kelly.llm(
+    prompt="Explain how to implement a binary search algorithm in Python",
+    model="chatgpt"
+)
+print(response)
+```
+
+### Text summarization
+
+Summarize long texts:
+
+```python
+long_text = """[Your long article or document here]"""
+
+response = await kelly.llm(
+    prompt=f"Summarize the following text in 3 bullet points:\n\n{long_text}",
+    model="chatgpt"
+)
+print(response)
+```
+
+### Creative writing
+
+Generate creative content:
+
+```python
+response = await kelly.llm(
+    prompt="Write a short story about a robot learning to paint",
+    model="gemini",
+    character="Creative Writer"
+)
+print(response)
+```
+
+### Translation assistance
+
+Translate text between languages:
+
+```python
+response = await kelly.llm(
+    prompt="Translate 'Hello, how are you?' to Spanish, French, and German",
+    model="chatgpt"
+)
+print(response)
+```
+
+## Conversational AI
+
+Build interactive chatbots:
+
+```python
+import asyncio
+from kellyapi import KellyAPI
+
+async def chatbot():
+    kelly = KellyAPI(api_key="your_api_key")
+    
+    print("Chatbot started. Type 'exit' to quit.")
+    
+    while True:
+        user_input = input("\nYou: ")
+        
+        if user_input.lower() == "exit":
+            break
+        
+        response = await kelly.llm(
+            prompt=user_input,
+            model="chatgpt",
+            character="Helpful Assistant"
+        )
+        
+        print(f"\nAI: {response}")
+
+asyncio.run(chatbot())
+```
+
+<Note>
+  The `llm()` method returns the text response as a string. Different models may have different response styles and capabilities.
+</Note>
+
+<Tip>
+  For best results, be specific in your prompts. Include context, desired format, and any constraints. For example: "Write a 100-word summary" or "Explain in simple terms for beginners."
+</Tip>
